@@ -110,17 +110,16 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
         import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
-        // --- PASTE YOUR FIREBASE KEYS BELOW ---
-        // If you don't have keys yet, leave this as is. The app will auto-fallback to LocalStorage.
+        // --- FIREBASE CONFIG (Updated) ---
         const firebaseConfig = {
-							  apiKey: "AIzaSyDSeqlg_QIEzHx2n15GcOP5jgKZzQ_MzZg",
-							  authDomain: "sdet-dashboard.firebaseapp.com",
-							  databaseURL: "https://sdet-dashboard-default-rtdb.firebaseio.com",
-							  projectId: "sdet-dashboard",
-							  storageBucket: "sdet-dashboard.firebasestorage.app",
-							  messagingSenderId: "917849703698",
-							  appId: "1:917849703698:web:764162e0198e5cf9439fcb"
-							};
+            apiKey: "AIzaSyDSeqlg_QIEzHx2n15GcOP5jgKZzQ_MzZg",
+            authDomain: "sdet-dashboard.firebaseapp.com",
+            databaseURL: "https://sdet-dashboard-default-rtdb.firebaseio.com",
+            projectId: "sdet-dashboard",
+            storageBucket: "sdet-dashboard.firebasestorage.app",
+            messagingSenderId: "917849703698",
+            appId: "1:917849703698:web:764162e0198e5cf9439fcb"
+        };
         // ----------------------------------------
 
         let app, db;
@@ -128,7 +127,7 @@
 
         // Try to Connect to Firebase
         try {
-
+            // FIXED: Removed the safety check here that was blocking your real key
             app = initializeApp(firebaseConfig);
             db = getDatabase(app);
             firebaseActive = true;
@@ -166,7 +165,11 @@
         window.saveToCloud = function() {
             if(firebaseActive && db) {
                 document.getElementById('loading-spinner').classList.remove('hidden');
-                set(ref(db, 'sdet_dashboard'), window.state).then(() => {
+                
+                // FIXED: Sanitization to prevent "undefined" error
+                const cleanState = JSON.parse(JSON.stringify(window.state));
+
+                set(ref(db, 'sdet_dashboard'), cleanState).then(() => {
                     document.getElementById('loading-spinner').classList.add('hidden');
                 }).catch(e => {
                     console.error("Save failed:", e);
@@ -189,7 +192,7 @@
             }
         }
     </script>
-	
+    
     <script>
         // --- DATA ENGINE (Default Data) ---
         // This is only used if Cloud is empty
@@ -295,7 +298,7 @@
             document.getElementById('health-today-list').innerHTML = state.routine.map(r => `<label class="flex items-center gap-3 p-3 bg-white border border-slate-100 rounded shadow-sm cursor-pointer hover:border-blue-300 transition"><input type="checkbox" class="w-5 h-5 accent-blue-600" ${state.todayHealth.includes(r.id)?'checked':''} onchange="toggleHealthItem(${r.id})"><span class="font-mono text-xs text-slate-400 bg-slate-100 px-1.5 py-0.5 rounded">${r.time}</span><span class="text-sm font-medium ${state.todayHealth.includes(r.id)?'line-through text-slate-400':''}">${r.text}</span></label>`).join('');
             document.getElementById('health-history-body').innerHTML = Object.keys(state.healthHistory).sort().reverse().map(d => `<tr class="border-b"><td class="p-3 text-xs font-mono">${d}</td><td class="p-3 text-xs text-slate-500">${state.healthHistory[d].length}/${state.routine.length} done</td></tr>`).join('');
         }
-
+        
         // --- ACTIONS ---
         function toggleHealthItem(id) { if(state.todayHealth.includes(id)) state.todayHealth=state.todayHealth.filter(i=>i!==id); else state.todayHealth.push(id); save(); }
         function saveHealthDay() { state.healthHistory[new Date().toISOString().split('T')[0]] = [...state.todayHealth]; save(); alert("Day Saved!"); }
@@ -328,4 +331,3 @@
     </script>
 </body>
 </html>
-
