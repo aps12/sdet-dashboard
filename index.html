@@ -110,86 +110,91 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
         import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
-		// Your web app's Firebase configuration
-		const firebaseConfig = {
-		  apiKey: "AIzaSyDSeqlg_QIEzHx2n15GcOP5jgKZzQ_MzZg",
-		  authDomain: "sdet-dashboard.firebaseapp.com",
-		  databaseURL: "https://sdet-dashboard-default-rtdb.firebaseio.com",
-		  projectId: "sdet-dashboard",
-		  storageBucket: "sdet-dashboard.firebasestorage.app",
-		  messagingSenderId: "917849703698",
-		  appId: "1:917849703698:web:764162e0198e5cf9439fcb"
-		};
-
-		// Initialize Firebase
-		const app = initializeApp(firebaseConfig);
-		
-        // (Get this from Firebase Console -> Project Settings -> General -> Your Apps)
+        // --- PASTE YOUR FIREBASE KEYS BELOW ---
+        // If you don't have keys yet, leave this as is. The app will auto-fallback to LocalStorage.
         const firebaseConfig = {
-            apiKey: "AIzaSy...",
-            authDomain: "your-project.firebaseapp.com",
-            databaseURL: "https://your-project-default-rtdb.firebaseio.com",
-            projectId: "your-project",
-            storageBucket: "your-project.appspot.com",
-            messagingSenderId: "123...",
-            appId: "1:123..."
-        };
+							  apiKey: "AIzaSyDSeqlg_QIEzHx2n15GcOP5jgKZzQ_MzZg",
+							  authDomain: "sdet-dashboard.firebaseapp.com",
+							  databaseURL: "https://sdet-dashboard-default-rtdb.firebaseio.com",
+							  projectId: "sdet-dashboard",
+							  storageBucket: "sdet-dashboard.firebasestorage.app",
+							  messagingSenderId: "917849703698",
+							  appId: "1:917849703698:web:764162e0198e5cf9439fcb"
+							};
         // ----------------------------------------
 
-        // Initialize
         let app, db;
+        let firebaseActive = false;
+
+        // Try to Connect to Firebase
         try {
+            // Check if user actually replaced the placeholder keys
+            if (firebaseConfig.apiKey.includes("AIzaSy...") || firebaseConfig.databaseURL.includes("your-project")) {
+                console.warn("⚠️ Firebase Config is default. Switching to Offline Mode.");
+                throw new Error("Default config detected");
+            }
+
             app = initializeApp(firebaseConfig);
             db = getDatabase(app);
-        } catch(e) {
-            console.error("Firebase Config Missing. Paste keys in HTML.");
-        }
+            firebaseActive = true;
+            console.log("✅ Firebase Initialized");
 
-        // Make functions globally available for HTML buttons
-        window.saveToCloud = function() {
-            if(!db) return;
-            document.getElementById('loading-spinner').classList.remove('hidden');
-            set(ref(db, 'sdet_dashboard'), state).then(() => {
-                document.getElementById('loading-spinner').classList.add('hidden');
-            });
-        }
-
-        // STARTUP LOGIC
-        if(db) {
+            // Cloud Data Listener
             const starCountRef = ref(db, 'sdet_dashboard');
             onValue(starCountRef, (snapshot) => {
                 const data = snapshot.val();
                 if(data) {
-                    state = data;
-                    // Ensure IDs exist (migration check)
-                    if(state.dsa.length > 0 && !state.dsa[0].id) { state.dsa = state.dsa.map((x,i) => ({...x, id: Date.now()+i})); }
-                    render();
+                    window.state = data;
+                    // Ensure IDs exist (migration fix)
+                    if(window.state.dsa && window.state.dsa.length > 0 && !window.state.dsa[0].id) { 
+                        window.state.dsa = window.state.dsa.map((x,i) => ({...x, id: Date.now()+i})); 
+                    }
+                    window.render();
+                    updateSyncStatus(true);
                 } else {
-                    // No data in cloud yet, use default and save it
-                    saveToCloud();
+                    // Cloud empty, save default
+                    window.saveToCloud();
                 }
-                updateSyncStatus(true);
             }, (error) => {
+                console.error("Firebase Read Error:", error);
                 updateSyncStatus(false);
+                window.initDefault(); // Fallback if read fails
             });
-        } else {
-            // Fallback for when keys aren't pasted yet
-            initDefault();
+
+        } catch(e) {
+            console.log("ℹ️ Running in Offline Mode (LocalStorage).");
+            window.initDefault(); // IMMEDIATE FALLBACK
+            updateSyncStatus(false);
+        }
+
+        // Global Cloud Save Function
+        window.saveToCloud = function() {
+            if(firebaseActive && db) {
+                document.getElementById('loading-spinner').classList.remove('hidden');
+                set(ref(db, 'sdet_dashboard'), window.state).then(() => {
+                    document.getElementById('loading-spinner').classList.add('hidden');
+                }).catch(e => {
+                    console.error("Save failed:", e);
+                    document.getElementById('loading-spinner').classList.add('hidden');
+                });
+            }
         }
 
         function updateSyncStatus(connected) {
             const icon = document.getElementById('sync-status-icon');
             const text = document.getElementById('sync-status-text');
-            if(connected) {
-                icon.className = "w-2 h-2 rounded-full bg-emerald-500 animate-pulse";
-                text.innerText = "Cloud Synced";
-            } else {
-                icon.className = "w-2 h-2 rounded-full bg-red-500";
-                text.innerText = "Disconnected";
+            if(icon && text) {
+                if(connected) {
+                    icon.className = "w-2 h-2 rounded-full bg-emerald-500 animate-pulse";
+                    text.innerText = "Cloud Synced";
+                } else {
+                    icon.className = "w-2 h-2 rounded-full bg-slate-400";
+                    text.innerText = "Offline Mode";
+                }
             }
         }
     </script>
-
+	
     <script>
         // --- DATA ENGINE (Default Data) ---
         // This is only used if Cloud is empty
