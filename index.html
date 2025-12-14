@@ -29,7 +29,7 @@
         <div>
             <div class="p-6 flex items-center gap-3 text-white font-bold text-xl tracking-wide">
                 <i class="ph-fill ph-code-block text-emerald-400"></i>
-                <span>Custom Planner<span class="text-emerald-400"></span></span>
+                <span>Custom Planner</span>
             </div>
             <nav class="px-4 space-y-1">
                 <button onclick="router('dashboard')" id="nav-dashboard" class="sidebar-item active w-full flex items-center gap-3 px-4 py-3 rounded-lg font-medium">
@@ -110,7 +110,7 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
         import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
-        // --- FIREBASE CONFIG (Updated) ---
+        // --- FIREBASE CONFIG ---
         const firebaseConfig = {
             apiKey: "AIzaSyDSeqlg_QIEzHx2n15GcOP5jgKZzQ_MzZg",
             authDomain: "sdet-dashboard.firebaseapp.com",
@@ -120,55 +120,69 @@
             messagingSenderId: "917849703698",
             appId: "1:917849703698:web:764162e0198e5cf9439fcb"
         };
-        // ----------------------------------------
 
+        // --- DEFAULT DATA ---
+        const dsa90Days = [
+            { day: 1, topic: "Arrays (Basics)", task: "Build Array Permutation", link: "https://leetcode.com/problems/build-array-from-permutation/", pri: "Low" },
+            { day: 1, topic: "Arrays (Basics)", task: "Running Sum 1D", link: "https://leetcode.com/problems/running-sum-of-1d-array/", pri: "Low" },
+            { day: 2, topic: "Arrays (Conditions)", task: "Contains Duplicate", link: "https://leetcode.com/problems/contains-duplicate/", pri: "Low" },
+        ];
+        for(let i=3; i<=90; i++) {
+            let topic = i<30?"Arrays/Strings":i<50?"LinkedList/Stack":i<70?"Trees/Graph":"DP";
+            dsa90Days.push({day: i, topic: topic, task: `Problem Day ${i}`, link: "#", pri: "Medium"});
+        }
+        const dsaWithIds = dsa90Days.map((x, i) => ({ ...x, id: Date.now() + i }));
+
+        // --- STATE OBJECT ---
+        let state = {
+            projects: [],
+            dsa: dsaWithIds,
+            dsaStatus: {}, 
+            routine: [ {id: 1, time: "08:00", text: "Wake up"}, {id: 2, time: "08:30", text: "DSA Practice"}, {id: 3, time: "10:00", text: "Work"}, {id: 4, time: "20:00", text: "Learning"} ],
+            healthHistory: {},
+            todayHealth: []
+        };
+
+        // --- FIREBASE INIT ---
         let app, db;
         let firebaseActive = false;
 
-        // Try to Connect to Firebase
         try {
-            // FIXED: Removed the safety check here that was blocking your real key
             app = initializeApp(firebaseConfig);
             db = getDatabase(app);
             firebaseActive = true;
             console.log("✅ Firebase Initialized");
 
-            // Cloud Data Listener
             const starCountRef = ref(db, 'sdet_dashboard');
             onValue(starCountRef, (snapshot) => {
                 const data = snapshot.val();
                 if(data) {
-                    window.state = data;
-                    // Ensure IDs exist (migration fix)
-                    if(window.state.dsa && window.state.dsa.length > 0 && !window.state.dsa[0].id) { 
-                        window.state.dsa = window.state.dsa.map((x,i) => ({...x, id: Date.now()+i})); 
+                    state = data;
+                    if(state.dsa && state.dsa.length > 0 && !state.dsa[0].id) { 
+                        state.dsa = state.dsa.map((x,i) => ({...x, id: Date.now()+i})); 
                     }
-                    window.render();
+                    render();
                     updateSyncStatus(true);
                 } else {
-                    // Cloud empty, save default
-                    window.saveToCloud();
+                    saveToCloud(); // Save defaults if empty
                 }
             }, (error) => {
-                console.error("Firebase Read Error:", error);
+                console.error("Firebase Error:", error);
                 updateSyncStatus(false);
-                window.initDefault(); // Fallback if read fails
             });
 
         } catch(e) {
-            console.log("ℹ️ Running in Offline Mode (LocalStorage).");
-            window.initDefault(); // IMMEDIATE FALLBACK
+            console.warn("Offline Mode:", e);
             updateSyncStatus(false);
         }
 
-        // Global Cloud Save Function
+        // --- GLOBAL ACTIONS (Attached to Window) ---
+        
         window.saveToCloud = function() {
-            if(firebaseActive && db) {
+            if(firebaseActive && db && state) {
                 document.getElementById('loading-spinner').classList.remove('hidden');
-                
-                // FIXED: Sanitization to prevent "undefined" error
-                const cleanState = JSON.parse(JSON.stringify(window.state));
-
+                // CLEAN DATA TO PREVENT UNDEFINED ERRORS
+                const cleanState = JSON.parse(JSON.stringify(state));
                 set(ref(db, 'sdet_dashboard'), cleanState).then(() => {
                     document.getElementById('loading-spinner').classList.add('hidden');
                 }).catch(e => {
@@ -176,7 +190,134 @@
                     document.getElementById('loading-spinner').classList.add('hidden');
                 });
             }
-        }
+        };
+
+        window.router = function(view) {
+            document.querySelectorAll('main > div[id^="view-"]').forEach(d => d.classList.add('hidden'));
+            document.getElementById(`view-${view}`).classList.remove('hidden');
+            document.querySelectorAll('.sidebar-item').forEach(b => b.classList.remove('active', 'bg-slate-800'));
+            document.getElementById(`nav-${view}`).classList.add('active');
+            if(view==='dashboard') updateCharts();
+        };
+
+        window.toggleHealthItem = function(id) { 
+            if(state.todayHealth.includes(id)) state.todayHealth=state.todayHealth.filter(i=>i!==id); else state.todayHealth.push(id); 
+            window.saveToCloud(); render(); 
+        };
+
+        window.saveHealthDay = function() { 
+            state.healthHistory[new Date().toISOString().split('T')[0]] = [...state.todayHealth]; 
+            window.saveToCloud(); 
+            alert("Day Saved!"); 
+            render(); 
+        };
+
+        window.toggleDSA = function(id) { 
+            if(state.dsaStatus[id]) delete state.dsaStatus[id]; else state.dsaStatus[id]=true; 
+            window.saveToCloud(); render(); 
+        };
+
+        window.updateSubtask = function(pid, idx, val) { 
+            state.projects.find(x=>x.id===pid).subtasks[idx].progress=val; 
+            window.saveToCloud(); render(); 
+        };
+
+        window.openProjectModal = function(type) { 
+            document.getElementById('modal-p-type').value=type; 
+            document.getElementById('modal-p-title').value=''; 
+            document.getElementById('modal-project').classList.remove('hidden'); 
+        };
+
+        window.saveProject = function() { 
+            const t=document.getElementById('modal-p-title').value; 
+            if(t) state.projects.push({id:Date.now(), title:t, type:document.getElementById('modal-p-type').value, subtasks:[]}); 
+            window.saveToCloud(); render(); 
+            window.closeModal('modal-project'); 
+        };
+
+        window.deleteProject = function(id) { 
+            if(confirm('Delete?')) { state.projects=state.projects.filter(p=>p.id!==id); window.saveToCloud(); render(); } 
+        };
+
+        window.openSubtaskModal = function(pid) { 
+            document.getElementById('modal-s-parent').value=pid; 
+            document.getElementById('modal-s-title').value=''; 
+            document.getElementById('modal-subtask').classList.remove('hidden'); 
+        };
+
+        window.saveSubtask = function() { 
+            const pid=parseInt(document.getElementById('modal-s-parent').value); 
+            const t=document.getElementById('modal-s-title').value; 
+            if(t) state.projects.find(p=>p.id===pid).subtasks.push({title:t, priority:document.getElementById('modal-s-priority').value, progress:0}); 
+            window.saveToCloud(); render(); 
+            window.closeModal('modal-subtask'); 
+        };
+
+        window.openRoutineModal = function() { 
+            document.getElementById('routine-editor-list').innerHTML = state.routine.map((r,i) => `<div class="flex gap-2 items-center routine-row"><input type="time" class="border p-2 rounded text-sm w-24" value="${r.time}"><input type="text" class="border p-2 rounded text-sm flex-1" value="${r.text}"><button onclick="this.parentElement.remove()" class="text-red-400"><i class="ph-bold ph-trash"></i></button></div>`).join(''); 
+            document.getElementById('modal-routine').classList.remove('hidden'); 
+        };
+
+        window.addRoutineItem = function() { 
+            const d=document.createElement('div'); d.className="flex gap-2 items-center routine-row"; 
+            d.innerHTML=`<input type="time" class="border p-2 rounded text-sm w-24"><input type="text" class="border p-2 rounded text-sm flex-1"><button onclick="this.parentElement.remove()" class="text-red-400"><i class="ph-bold ph-trash"></i></button>`; 
+            document.getElementById('routine-editor-list').appendChild(d); 
+        };
+
+        window.saveRoutineEdit = function() { 
+            state.routine=[]; 
+            document.querySelectorAll('.routine-row').forEach((r,i) => { 
+                const inps=r.querySelectorAll('input'); 
+                if(inps[1].value) state.routine.push({id:i+1, time:inps[0].value, text:inps[1].value}); 
+            }); 
+            window.saveToCloud(); render(); 
+            window.closeModal('modal-routine'); 
+        };
+
+        window.openAddDSAModal = function() { 
+            document.getElementById('modal-dsa-title').innerText = "Add New Problem"; 
+            document.getElementById('dsa-id').value = ""; 
+            document.getElementById('dsa-day').value = ""; 
+            document.getElementById('dsa-topic').value = ""; 
+            document.getElementById('dsa-name').value = ""; 
+            document.getElementById('dsa-link').value = ""; 
+            document.getElementById('dsa-priority').value = "Medium"; 
+            document.getElementById('modal-dsa').classList.remove('hidden'); 
+        };
+
+        window.openEditDSAModal = function(id) { 
+            const item = state.dsa.find(x => x.id === id); 
+            document.getElementById('modal-dsa-title').innerText = "Edit Problem"; 
+            document.getElementById('dsa-id').value = id; 
+            document.getElementById('dsa-day').value = item.day; 
+            document.getElementById('dsa-topic').value = item.topic; 
+            document.getElementById('dsa-name').value = item.task; 
+            document.getElementById('dsa-link').value = item.link; 
+            document.getElementById('dsa-priority').value = item.pri; 
+            document.getElementById('modal-dsa').classList.remove('hidden'); 
+        };
+
+        window.saveDSA = function() { 
+            const id = document.getElementById('dsa-id').value; 
+            const day = parseInt(document.getElementById('dsa-day').value); 
+            const topic = document.getElementById('dsa-topic').value; 
+            const task = document.getElementById('dsa-name').value; 
+            const link = document.getElementById('dsa-link').value; 
+            const pri = document.getElementById('dsa-priority').value; 
+            if(!task || !day) return; 
+            if(id) { 
+                const idx = state.dsa.findIndex(x => x.id == id); 
+                if(idx !== -1) { state.dsa[idx] = { ...state.dsa[idx], day, topic, task, link, pri }; } 
+            } else { 
+                state.dsa.push({ id: Date.now(), day, topic, task, link, pri }); 
+            } 
+            window.saveToCloud(); render(); 
+            window.closeModal('modal-dsa'); 
+        };
+
+        window.closeModal = function(id) { document.getElementById(id).classList.add('hidden'); };
+        window.exportData = function() { const d = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(state)); const a = document.createElement('a'); a.href = d; a.download = "sdet_backup.json"; a.click(); };
+        window.resetApp = function() { if(confirm("Reset?")) { window.saveToCloud(); location.reload(); }};
 
         function updateSyncStatus(connected) {
             const icon = document.getElementById('sync-status-icon');
@@ -191,46 +332,7 @@
                 }
             }
         }
-    </script>
-    
-    <script>
-        // --- DATA ENGINE (Default Data) ---
-        // This is only used if Cloud is empty
-        const dsa90Days = [
-            { day: 1, topic: "Arrays (Basics)", task: "Build Array Permutation", link: "https://leetcode.com/problems/build-array-from-permutation/", pri: "Low" },
-            { day: 1, topic: "Arrays (Basics)", task: "Running Sum 1D", link: "https://leetcode.com/problems/running-sum-of-1d-array/", pri: "Low" },
-            { day: 2, topic: "Arrays (Conditions)", task: "Contains Duplicate", link: "https://leetcode.com/problems/contains-duplicate/", pri: "Low" },
-            // ... (Includes days 1-10)
-        ];
-        for(let i=3; i<=90; i++) {
-            let topic = i<30?"Arrays/Strings":i<50?"LinkedList/Stack":i<70?"Trees/Graph":"DP";
-            dsa90Days.push({day: i, topic: topic, task: `Problem Day ${i}`, link: "#", pri: "Medium"});
-        }
-        const dsaWithIds = dsa90Days.map((x, i) => ({ ...x, id: Date.now() + i }));
 
-        let state = {
-            projects: [],
-            dsa: dsaWithIds,
-            dsaStatus: {}, 
-            routine: [ {id: 1, time: "08:00", text: "Wake up"}, {id: 2, time: "08:30", text: "DSA Practice"}, {id: 3, time: "10:00", text: "Work"}, {id: 4, time: "20:00", text: "Learning"} ],
-            healthHistory: {},
-            todayHealth: []
-        };
-
-        // --- GLOBAL ACTIONS (Called by buttons) ---
-        // Note: We override 'save' to call 'window.saveToCloud' defined in module
-        function save() { 
-            if(window.saveToCloud) window.saveToCloud(); 
-            render(); 
-        }
-
-        function initDefault() {
-            document.getElementById('current-date').innerText = new Date().toLocaleDateString('en-IN', {weekday:'long', day:'numeric', month:'long'});
-            render();
-            router('dashboard');
-        }
-
-        // --- RENDERERS ---
         function render() {
             renderProjects('Work'); renderProjects('Epam'); renderProjects('Learning');
             renderDSA(); renderHealth(); renderStats();
@@ -298,25 +400,6 @@
             document.getElementById('health-today-list').innerHTML = state.routine.map(r => `<label class="flex items-center gap-3 p-3 bg-white border border-slate-100 rounded shadow-sm cursor-pointer hover:border-blue-300 transition"><input type="checkbox" class="w-5 h-5 accent-blue-600" ${state.todayHealth.includes(r.id)?'checked':''} onchange="toggleHealthItem(${r.id})"><span class="font-mono text-xs text-slate-400 bg-slate-100 px-1.5 py-0.5 rounded">${r.time}</span><span class="text-sm font-medium ${state.todayHealth.includes(r.id)?'line-through text-slate-400':''}">${r.text}</span></label>`).join('');
             document.getElementById('health-history-body').innerHTML = Object.keys(state.healthHistory).sort().reverse().map(d => `<tr class="border-b"><td class="p-3 text-xs font-mono">${d}</td><td class="p-3 text-xs text-slate-500">${state.healthHistory[d].length}/${state.routine.length} done</td></tr>`).join('');
         }
-        
-        // --- ACTIONS ---
-        function toggleHealthItem(id) { if(state.todayHealth.includes(id)) state.todayHealth=state.todayHealth.filter(i=>i!==id); else state.todayHealth.push(id); save(); }
-        function saveHealthDay() { state.healthHistory[new Date().toISOString().split('T')[0]] = [...state.todayHealth]; save(); alert("Day Saved!"); }
-        function toggleDSA(id) { if(state.dsaStatus[id]) delete state.dsaStatus[id]; else state.dsaStatus[id]=true; save(); }
-        function updateSubtask(pid, idx, val) { state.projects.find(x=>x.id===pid).subtasks[idx].progress=val; save(); }
-        function openProjectModal(type) { document.getElementById('modal-p-type').value=type; document.getElementById('modal-p-title').value=''; document.getElementById('modal-project').classList.remove('hidden'); }
-        function saveProject() { const t=document.getElementById('modal-p-title').value; if(t) state.projects.push({id:Date.now(), title:t, type:document.getElementById('modal-p-type').value, subtasks:[]}); save(); closeModal('modal-project'); }
-        function deleteProject(id) { if(confirm('Delete?')) { state.projects=state.projects.filter(p=>p.id!==id); save(); } }
-        function openSubtaskModal(pid) { document.getElementById('modal-s-parent').value=pid; document.getElementById('modal-s-title').value=''; document.getElementById('modal-subtask').classList.remove('hidden'); }
-        function saveSubtask() { const pid=parseInt(document.getElementById('modal-s-parent').value); const t=document.getElementById('modal-s-title').value; if(t) state.projects.find(p=>p.id===pid).subtasks.push({title:t, priority:document.getElementById('modal-s-priority').value, progress:0}); save(); closeModal('modal-subtask'); }
-        function openRoutineModal() { document.getElementById('routine-editor-list').innerHTML = state.routine.map((r,i) => `<div class="flex gap-2 items-center routine-row"><input type="time" class="border p-2 rounded text-sm w-24" value="${r.time}"><input type="text" class="border p-2 rounded text-sm flex-1" value="${r.text}"><button onclick="this.parentElement.remove()" class="text-red-400"><i class="ph-bold ph-trash"></i></button></div>`).join(''); document.getElementById('modal-routine').classList.remove('hidden'); }
-        function addRoutineItem() { const d=document.createElement('div'); d.className="flex gap-2 items-center routine-row"; d.innerHTML=`<input type="time" class="border p-2 rounded text-sm w-24"><input type="text" class="border p-2 rounded text-sm flex-1"><button onclick="this.parentElement.remove()" class="text-red-400"><i class="ph-bold ph-trash"></i></button>`; document.getElementById('routine-editor-list').appendChild(d); }
-        function saveRoutineEdit() { state.routine=[]; document.querySelectorAll('.routine-row').forEach((r,i) => { const inps=r.querySelectorAll('input'); if(inps[1].value) state.routine.push({id:i+1, time:inps[0].value, text:inps[1].value}); }); save(); closeModal('modal-routine'); }
-        function openAddDSAModal() { document.getElementById('modal-dsa-title').innerText = "Add New Problem"; document.getElementById('dsa-id').value = ""; document.getElementById('dsa-day').value = ""; document.getElementById('dsa-topic').value = ""; document.getElementById('dsa-name').value = ""; document.getElementById('dsa-link').value = ""; document.getElementById('dsa-priority').value = "Medium"; document.getElementById('modal-dsa').classList.remove('hidden'); }
-        function openEditDSAModal(id) { const item = state.dsa.find(x => x.id === id); document.getElementById('modal-dsa-title').innerText = "Edit Problem"; document.getElementById('dsa-id').value = id; document.getElementById('dsa-day').value = item.day; document.getElementById('dsa-topic').value = item.topic; document.getElementById('dsa-name').value = item.task; document.getElementById('dsa-link').value = item.link; document.getElementById('dsa-priority').value = item.pri; document.getElementById('modal-dsa').classList.remove('hidden'); }
-        function saveDSA() { const id = document.getElementById('dsa-id').value; const day = parseInt(document.getElementById('dsa-day').value); const topic = document.getElementById('dsa-topic').value; const task = document.getElementById('dsa-name').value; const link = document.getElementById('dsa-link').value; const pri = document.getElementById('dsa-priority').value; if(!task || !day) return; if(id) { const idx = state.dsa.findIndex(x => x.id == id); if(idx !== -1) { state.dsa[idx] = { ...state.dsa[idx], day, topic, task, link, pri }; } } else { state.dsa.push({ id: Date.now(), day, topic, task, link, pri }); } save(); closeModal('modal-dsa'); }
-        function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
-        function router(view) { document.querySelectorAll('main > div[id^="view-"]').forEach(d => d.classList.add('hidden')); document.getElementById(`view-${view}`).classList.remove('hidden'); document.querySelectorAll('.sidebar-item').forEach(b => b.classList.remove('active', 'bg-slate-800')); document.getElementById(`nav-${view}`).classList.add('active'); if(view==='dashboard') updateCharts(); }
 
         function updateCharts() {
             const ctx = document.getElementById('chart-domain'); if(window.myChart) window.myChart.destroy();
@@ -325,9 +408,10 @@
             const d = (Object.keys(state.dsaStatus).length/90)*100;
             window.myChart = new Chart(ctx, { type: 'doughnut', data: { labels: ['Work', 'Epam', 'Learn', 'DSA'], datasets: [{ data: [w||1, e||1, l||1, d||1], backgroundColor: ['#3b82f6', '#ec4899', '#8b5cf6', '#10b981'] }] }, options: { maintainAspectRatio:false, plugins:{legend:{position:'right'}} } });
         }
-        
-        // Init (if firebase fails)
-        if(!db) initDefault();
+
+        // Init
+        render();
+        window.router('dashboard');
     </script>
 </body>
 </html>
