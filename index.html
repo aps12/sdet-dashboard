@@ -128,11 +128,6 @@
 
         // Try to Connect to Firebase
         try {
-            // Check if user actually replaced the placeholder keys
-            if (firebaseConfig.apiKey.includes("AIzaSy...") || firebaseConfig.databaseURL.includes("your-project")) {
-                console.warn("⚠️ Firebase Config is default. Switching to Offline Mode.");
-                throw new Error("Default config detected");
-            }
 
             app = initializeApp(firebaseConfig);
             db = getDatabase(app);
@@ -333,3 +328,4 @@
     </script>
 </body>
 </html>
+
