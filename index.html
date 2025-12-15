@@ -3,12 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Planner</title>
+    <title>SDET Mastery | v20</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
         
         :root { --safe-bottom: env(safe-area-inset-bottom); }
         
@@ -18,11 +18,9 @@
             -webkit-tap-highlight-color: transparent; 
         }
         
-        /* Smooth Scrolling */
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 
-        /* Modern Card */
         .card { 
             background: white; 
             border-radius: 1rem; 
@@ -46,33 +44,57 @@
         }
         .donut-text { position: relative; font-size: 0.7rem; font-weight: 800; color: #334155; }
 
-        /* Sidebar Item Transition */
+        /* Sidebar */
         .sidebar-item { 
             display: flex; align-items: center; 
             padding: 12px; border-radius: 12px; 
             color: #64748b; font-weight: 500; cursor: pointer; 
             transition: all 0.2s;
-            white-space: nowrap; /* Prevent text wrapping during expansion */
+            white-space: nowrap; 
         }
         .sidebar-item:hover { background-color: #f8fafc; color: #1e293b; }
         .sidebar-item.active { background-color: #eff6ff; color: #2563eb; font-weight: 600; }
         
-        /* Sidebar Icon centering when collapsed */
         .group:not(:hover) .sidebar-item { justify-content: center; }
         .group:hover .sidebar-item { justify-content: flex-start; }
+        .nav-text { opacity: 0; width: 0; display: none; transition: opacity 0.2s ease-in-out; }
+        .group:hover .nav-text { opacity: 1; width: auto; display: inline-block; }
 
-        /* Text Hide/Show transition */
-        .nav-text {
-            opacity: 0; width: 0; display: none;
-            transition: opacity 0.2s ease-in-out;
-        }
-        .group:hover .nav-text {
-            opacity: 1; width: auto; display: inline-block;
-        }
+        .nav-btn { transition: all 0.2s; color: #94a3b8; }
+        .nav-btn.active { color: #2563eb; transform: scale(1.05); }
 
-        /* Loader */
         .loader { border: 3px solid #e2e8f0; border-top: 3px solid #3b82f6; border-radius: 50%; width: 20px; height: 20px; animation: spin 1s linear infinite; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+        /* Custom Checkbox */
+        .custom-checkbox {
+            appearance: none;
+            background-color: #fff;
+            margin: 0;
+            font: inherit;
+            color: currentColor;
+            width: 1.15em;
+            height: 1.15em;
+            border: 0.15em solid #cbd5e1;
+            border-radius: 0.15em;
+            display: grid;
+            place-content: center;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .custom-checkbox::before {
+            content: "";
+            width: 0.65em;
+            height: 0.65em;
+            transform: scale(0);
+            transition: 120ms transform ease-in-out;
+            box-shadow: inset 1em 1em white;
+            background-color: CanvasText;
+            transform-origin: center;
+            clip-path: polygon(14% 44%, 0 65%, 50% 100%, 100% 16%, 80% 0%, 43% 62%);
+        }
+        .custom-checkbox:checked { background-color: #10b981; border-color: #10b981; }
+        .custom-checkbox:checked::before { transform: scale(1); }
     </style>
 </head>
 <body class="flex h-screen overflow-hidden text-slate-800 bg-slate-50">
@@ -82,30 +104,18 @@
             <div class="h-20 flex items-center px-5 gap-3 transition-all duration-300">
                 <div class="w-10 h-10 min-w-[2.5rem] bg-blue-600 rounded-xl flex items-center justify-center text-white shadow-blue-200 shadow-lg"><i class="ph-bold ph-rocket-launch text-xl"></i></div>
                 <div class="nav-text whitespace-nowrap">
-                    <h1 class="font-bold text-lg leading-tight text-slate-900">Planner</h1>
-                    <p class="text-xs text-slate-400 font-medium">SDET Edition</p>
+                    <h1 class="font-bold text-lg leading-tight text-slate-900">SDET Plan</h1>
+                    <p class="text-xs text-slate-400 font-medium">Mastery Edition</p>
                 </div>
             </div>
             
             <nav class="px-3 space-y-2 mt-4">
-                <button onclick="router('dashboard')" id="d-nav-dashboard" class="sidebar-item active w-full" title="Dashboard">
-                    <i class="ph ph-squares-four text-2xl"></i> <span class="nav-text ml-2">Dashboard</span>
-                </button>
-                <button onclick="router('dsa')" id="d-nav-dsa" class="sidebar-item w-full" title="DSA Roadmap">
-                    <i class="ph ph-brackets-curly text-2xl"></i> <span class="nav-text ml-2">90-Day DSA</span>
-                </button>
-                <button onclick="router('projects')" id="d-nav-projects" class="sidebar-item w-full" title="Client Work">
-                    <i class="ph ph-briefcase text-2xl"></i> <span class="nav-text ml-2">Client Work</span>
-                </button>
-                <button onclick="router('epam')" id="d-nav-epam" class="sidebar-item w-full" title="Epam / Personal">
-                    <i class="ph ph-code text-2xl"></i> <span class="nav-text ml-2">Personal/Epam</span>
-                </button>
-                <button onclick="router('learning')" id="d-nav-learning" class="sidebar-item w-full" title="Learning">
-                    <i class="ph ph-certificate text-2xl"></i> <span class="nav-text ml-2">Learning</span>
-                </button>
-                <button onclick="router('health')" id="d-nav-health" class="sidebar-item w-full" title="Routine">
-                    <i class="ph ph-heartbeat text-2xl"></i> <span class="nav-text ml-2">Routine</span>
-                </button>
+                <button onclick="router('dashboard')" id="d-nav-dashboard" class="sidebar-item active w-full"><i class="ph ph-squares-four text-2xl"></i> <span class="nav-text ml-2">Dashboard</span></button>
+                <button onclick="router('dsa')" id="d-nav-dsa" class="sidebar-item w-full"><i class="ph ph-brackets-curly text-2xl"></i> <span class="nav-text ml-2">DSA Mastery</span></button>
+                <button onclick="router('projects')" id="d-nav-projects" class="sidebar-item w-full"><i class="ph ph-briefcase text-2xl"></i> <span class="nav-text ml-2">Client Work</span></button>
+                <button onclick="router('epam')" id="d-nav-epam" class="sidebar-item w-full"><i class="ph ph-code text-2xl"></i> <span class="nav-text ml-2">Personal/Epam</span></button>
+                <button onclick="router('learning')" id="d-nav-learning" class="sidebar-item w-full"><i class="ph ph-certificate text-2xl"></i> <span class="nav-text ml-2">Learning</span></button>
+                <button onclick="router('health')" id="d-nav-health" class="sidebar-item w-full"><i class="ph ph-heartbeat text-2xl"></i> <span class="nav-text ml-2">Routine</span></button>
             </nav>
         </div>
 
@@ -114,9 +124,13 @@
                 <div id="sync-status-icon" class="w-2.5 h-2.5 rounded-full bg-red-500 shrink-0"></div>
                 <span id="sync-status-text" class="nav-text text-xs font-semibold text-slate-400">Connecting...</span>
             </div>
-            <button onclick="exportData()" class="mt-3 w-full h-10 flex items-center justify-center bg-white border border-slate-200 rounded-lg hover:bg-slate-50 text-slate-600 transition shadow-sm" title="Backup Data">
+            <button onclick="exportData()" class="mt-3 w-full h-10 flex items-center justify-center bg-white border border-slate-200 rounded-lg hover:bg-slate-50 text-slate-600 transition shadow-sm">
                 <i class="ph-bold ph-download-simple text-lg"></i>
-                <span class="nav-text ml-2 text-xs font-bold">Backup Data</span>
+                <span class="nav-text ml-2 text-xs font-bold">Backup</span>
+            </button>
+            <button onclick="resetApp()" class="mt-2 w-full h-8 flex items-center justify-center bg-red-50 text-red-500 hover:bg-red-100 rounded-lg transition text-xs font-bold">
+                <i class="ph-bold ph-trash"></i>
+                <span class="nav-text ml-2">Clear Data</span>
             </button>
         </div>
     </aside>
@@ -130,7 +144,7 @@
             </div>
             <div class="flex items-center gap-4">
                 <div id="loading-spinner" class="hidden"><div class="loader"></div></div>
-                <button onclick="resetApp()" class="md:hidden text-slate-400 p-2"><i class="ph-bold ph-trash"></i></button>
+                <button onclick="resetApp()" class="md:hidden text-red-400 p-2"><i class="ph-bold ph-trash"></i></button>
             </div>
         </header>
 
@@ -138,107 +152,68 @@
 
             <div id="view-dashboard" class="space-y-6">
                 <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 md:gap-4">
-                    <div class="card p-4 flex flex-col items-center justify-center gap-3" id="kpi-overall">
-                        <div class="donut-ring" style="--percent:0; --color:#3b82f6"><span class="donut-text">0%</span></div>
-                        <span class="text-[11px] font-bold text-slate-500 uppercase tracking-wide">Overall</span>
-                    </div>
-                    <div class="card p-4 flex flex-col items-center justify-center gap-3" id="kpi-dsa">
-                        <div class="donut-ring" style="--percent:0; --color:#10b981"><span class="donut-text">0</span></div>
-                        <span class="text-[11px] font-bold text-slate-500 uppercase tracking-wide">DSA (90)</span>
-                    </div>
-                    <div class="card p-4 flex flex-col items-center justify-center gap-3" id="kpi-client">
-                        <div class="donut-ring" style="--percent:0; --color:#6366f1"><span class="donut-text">0%</span></div>
-                        <span class="text-[11px] font-bold text-slate-500 uppercase tracking-wide">Client</span>
-                    </div>
-                    <div class="card p-4 flex flex-col items-center justify-center gap-3" id="kpi-epam">
-                        <div class="donut-ring" style="--percent:0; --color:#ec4899"><span class="donut-text">0%</span></div>
-                        <span class="text-[11px] font-bold text-slate-500 uppercase tracking-wide">Epam</span>
-                    </div>
-                    <div class="card p-4 flex flex-col items-center justify-center gap-3" id="kpi-cert">
-                        <div class="donut-ring" style="--percent:0; --color:#8b5cf6"><span class="donut-text">0%</span></div>
-                        <span class="text-[11px] font-bold text-slate-500 uppercase tracking-wide">Certs</span>
-                    </div>
-                    <div class="card p-4 flex flex-col items-center justify-center gap-3" id="kpi-streak">
-                        <div class="donut-ring" style="--percent:0; --color:#f59e0b"><span class="donut-text">0</span></div>
-                        <span class="text-[11px] font-bold text-slate-500 uppercase tracking-wide">Streak</span>
-                    </div>
+                    <div class="card p-4 flex flex-col items-center justify-center gap-3" id="kpi-overall"><div class="donut-ring" style="--percent:0; --color:#3b82f6"><span class="donut-text">0%</span></div><span class="text-[11px] font-bold text-slate-500 uppercase tracking-wide">Overall</span></div>
+                    <div class="card p-4 flex flex-col items-center justify-center gap-3" id="kpi-dsa"><div class="donut-ring" style="--percent:0; --color:#10b981"><span class="donut-text">0</span></div><span class="text-[11px] font-bold text-slate-500 uppercase tracking-wide">DSA Mastery</span></div>
+                    <div class="card p-4 flex flex-col items-center justify-center gap-3" id="kpi-client"><div class="donut-ring" style="--percent:0; --color:#6366f1"><span class="donut-text">0%</span></div><span class="text-[11px] font-bold text-slate-500 uppercase tracking-wide">Client</span></div>
+                    <div class="card p-4 flex flex-col items-center justify-center gap-3" id="kpi-epam"><div class="donut-ring" style="--percent:0; --color:#ec4899"><span class="donut-text">0%</span></div><span class="text-[11px] font-bold text-slate-500 uppercase tracking-wide">Epam</span></div>
+                    <div class="card p-4 flex flex-col items-center justify-center gap-3" id="kpi-cert"><div class="donut-ring" style="--percent:0; --color:#8b5cf6"><span class="donut-text">0%</span></div><span class="text-[11px] font-bold text-slate-500 uppercase tracking-wide">Certs</span></div>
+                    <div class="card p-4 flex flex-col items-center justify-center gap-3" id="kpi-streak"><div class="donut-ring" style="--percent:0; --color:#f59e0b"><span class="donut-text">0</span></div><span class="text-[11px] font-bold text-slate-500 uppercase tracking-wide">Streak</span></div>
                 </div>
-
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
                     <div class="card p-5 h-[340px] flex flex-col">
-                        <div class="flex items-center gap-2 mb-4 pb-2 border-b border-slate-100">
-                            <div class="w-6 h-6 rounded-full bg-orange-100 flex items-center justify-center text-orange-600"><i class="ph-fill ph-fire"></i></div>
-                            <h3 class="font-bold text-slate-800 text-sm uppercase tracking-wide">High Priority</h3>
-                        </div>
+                        <div class="flex items-center gap-2 mb-4 pb-2 border-b border-slate-100"><div class="w-6 h-6 rounded-full bg-orange-100 flex items-center justify-center text-orange-600"><i class="ph-fill ph-fire"></i></div><h3 class="font-bold text-slate-800 text-sm uppercase tracking-wide">High Priority</h3></div>
                         <div id="focus-list" class="space-y-2 overflow-y-auto flex-1 pr-1 custom-scroll"></div>
                     </div>
                     <div class="card p-5 h-[340px] flex flex-col">
-                        <div class="flex items-center gap-2 mb-2">
-                            <div class="w-6 h-6 rounded-full bg-blue-100 flex items-center justify-center text-blue-600"><i class="ph-fill ph-chart-pie-slice"></i></div>
-                            <h3 class="font-bold text-slate-800 text-sm uppercase tracking-wide">Effort Split</h3>
-                        </div>
-                        <div class="flex-1 relative w-full h-full flex items-center justify-center">
-                            <canvas id="chart-domain"></canvas>
-                        </div>
+                        <div class="flex items-center gap-2 mb-2"><div class="w-6 h-6 rounded-full bg-blue-100 flex items-center justify-center text-blue-600"><i class="ph-fill ph-chart-pie-slice"></i></div><h3 class="font-bold text-slate-800 text-sm uppercase tracking-wide">Effort Split</h3></div>
+                        <div class="flex-1 relative w-full h-full flex items-center justify-center"><canvas id="chart-domain"></canvas></div>
                     </div>
                 </div>
             </div>
 
-            <div id="view-dsa" class="hidden space-y-4">
-                <div class="card p-4 sticky top-0 z-10 shadow-md border-b-2 border-emerald-500 rounded-none -mx-4 md:rounded-xl md:mx-0">
-                    <div class="flex justify-between items-center">
-                        <div>
-                            <h2 class="text-lg font-bold text-slate-900">90-Day Roadmap</h2>
-                            <p class="text-xs text-slate-500 font-medium" id="dsa-progress-text">Loading...</p>
+            <div id="view-dsa" class="hidden space-y-6">
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                    <div>
+                        <h2 class="text-2xl font-bold text-slate-900">Python DSA Mastery</h2>
+                        <p class="text-sm text-slate-500">20-Part Curriculum • Interview Focused</p>
+                    </div>
+                    <div class="flex items-center gap-4 bg-white px-4 py-2 rounded-lg shadow-sm border border-slate-200">
+                        <div class="text-right">
+                            <div class="text-xs text-slate-400 font-bold uppercase">Progress</div>
+                            <div class="text-lg font-bold text-emerald-600" id="dsa-total-progress">0%</div>
                         </div>
-                        <button onclick="openAddDSAModal()" class="bg-emerald-600 text-white w-10 h-10 rounded-full flex items-center justify-center shadow-lg hover:bg-emerald-700 active:scale-95 transition"><i class="ph-bold ph-plus text-lg"></i></button>
+                        <div class="w-12 h-12">
+                            <canvas id="dsa-mini-chart"></canvas>
+                        </div>
                     </div>
                 </div>
-                <div id="dsa-list-container" class="space-y-3 pb-4"></div>
+
+                <div id="dsa-cards-container" class="grid grid-cols-1 xl:grid-cols-2 gap-6">
+                    </div>
             </div>
 
             <div id="view-projects" class="hidden space-y-4">
-                <div class="flex justify-between items-center mb-2 px-1">
-                    <h2 class="text-xl font-bold text-slate-800">Client Work</h2>
-                    <button onclick="openProjectModal('Work')" class="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-semibold shadow-md hover:bg-blue-700">+ New Project</button>
-                </div>
+                <div class="flex justify-between items-center mb-2 px-1"><h2 class="text-xl font-bold text-slate-800">Client Work</h2><button onclick="openProjectModal('Work')" class="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-semibold shadow-md hover:bg-blue-700">+ New Project</button></div>
                 <div id="container-Work" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
             </div>
 
             <div id="view-epam" class="hidden space-y-4">
-                <div class="flex justify-between items-center mb-2 px-1">
-                    <h2 class="text-xl font-bold text-pink-700">Epam / Personal</h2>
-                    <button onclick="openProjectModal('Epam')" class="bg-pink-600 text-white px-4 py-2 rounded-lg text-sm font-semibold shadow-md hover:bg-pink-700">+ New Project</button>
-                </div>
+                <div class="flex justify-between items-center mb-2 px-1"><h2 class="text-xl font-bold text-pink-700">Epam / Personal</h2><button onclick="openProjectModal('Epam')" class="bg-pink-600 text-white px-4 py-2 rounded-lg text-sm font-semibold shadow-md hover:bg-pink-700">+ New Project</button></div>
                 <div id="container-Epam" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
             </div>
 
             <div id="view-learning" class="hidden space-y-4">
-                <div class="flex justify-between items-center mb-2 px-1">
-                    <h2 class="text-xl font-bold text-purple-700">Certifications</h2>
-                    <button onclick="openProjectModal('Learning')" class="bg-purple-600 text-white px-4 py-2 rounded-lg text-sm font-semibold shadow-md hover:bg-purple-700">+ New Cert</button>
-                </div>
+                <div class="flex justify-between items-center mb-2 px-1"><h2 class="text-xl font-bold text-purple-700">Certifications</h2><button onclick="openProjectModal('Learning')" class="bg-purple-600 text-white px-4 py-2 rounded-lg text-sm font-semibold shadow-md hover:bg-purple-700">+ New Cert</button></div>
                 <div id="container-Learning" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
             </div>
 
             <div id="view-health" class="hidden space-y-4">
                 <div class="card p-6 border-t-4 border-orange-500">
-                    <div class="flex justify-between items-center mb-6">
-                        <h3 class="font-bold text-lg text-slate-800">Today's Routine</h3>
-                        <button onclick="openRoutineModal()" class="text-xs bg-slate-100 px-3 py-1.5 rounded-full font-bold text-slate-600 border border-slate-200">Edit List</button>
-                    </div>
+                    <div class="flex justify-between items-center mb-6"><h3 class="font-bold text-lg text-slate-800">Today's Routine</h3><button onclick="openRoutineModal()" class="text-xs bg-slate-100 px-3 py-1.5 rounded-full font-bold text-slate-600 border border-slate-200">Edit List</button></div>
                     <div id="health-today-list" class="space-y-3"></div>
                     <button onclick="saveHealthDay()" class="mt-8 w-full bg-slate-900 text-white py-3.5 rounded-xl font-bold text-sm shadow-lg active:scale-95 transition flex items-center justify-center gap-2"><i class="ph-bold ph-check"></i> Finish Day</button>
                 </div>
-                <div class="card p-6">
-                    <h3 class="font-bold text-xs text-slate-400 uppercase tracking-widest mb-4">Consistency Log</h3>
-                    <div class="overflow-y-auto max-h-64">
-                        <table class="w-full text-sm">
-                            <thead class="text-left text-xs text-slate-400 border-b border-slate-100"><tr><th class="pb-2">Date</th><th class="pb-2 text-right">Score</th></tr></thead>
-                            <tbody id="health-history-body"></tbody>
-                        </table>
-                    </div>
-                </div>
+                <div class="card p-6"><h3 class="font-bold text-xs text-slate-400 uppercase tracking-widest mb-4">Consistency Log</h3><div class="overflow-y-auto max-h-64"><table class="w-full text-sm"><thead class="text-left text-xs text-slate-400 border-b border-slate-100"><tr><th class="pb-2">Date</th><th class="pb-2 text-right">Score</th></tr></thead><tbody id="health-history-body"></tbody></table></div></div>
             </div>
 
         </div>
@@ -253,15 +228,1109 @@
         <button onclick="router('health')" id="m-nav-health" class="nav-btn flex flex-col items-center gap-1"><i class="ph-bold ph-heartbeat text-2xl"></i><span class="text-[10px] font-medium">Habit</span></button>
     </div>
 
-    <div id="modal-wrapper" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4">
-        <div id="modal-content" class="bg-white rounded-2xl w-full max-w-sm p-6 shadow-2xl transform transition-all scale-100 border border-slate-100"></div>
+    <div id="modal-wrapper" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4" onclick="handleOutsideClick(event)">
+        <div id="modal-content" class="bg-white rounded-2xl w-full max-w-sm p-6 shadow-2xl transform transition-all scale-100 border border-slate-100 relative">
+            <button onclick="closeModal()" class="absolute top-4 right-4 text-slate-400 hover:text-slate-600 z-10"><i class="ph-bold ph-x text-xl"></i></button>
+            <div id="modal-body"></div>
+        </div>
     </div>
+
+    <script>
+        // --- 1. CONFIGURATION DATA (The 20 Parts) ---
+        const dsaCurriculum = [
+            {
+    "id": 1,
+    "title": "Part 1: Python Memory Model & Variables",
+    "topics": "Dynamic Typing, Object Interning, Mutability vs Immutability, 'is' vs '=='",
+    "learnLink": "https://chat.openai.com/?q=Act+as+a+Senior+Python+Interviewer.+Explain+Python's+memory+model+specifically+referencing+Stack+vs+Heap+and+object+reference+counting.+Use+ASCII+diagrams+to+show+variables+referencing+objects.+Explain+why+a=b+doesn't+copy.+Explain+small+integer+caching+and+string+interning.+Provide+3+tricky+output+prediction+questions.",
+    "problems": [
+      {"id": "p1_1", "name": "Running Sum of 1d Array", "url": "https://leetcode.com/problems/running-sum-of-1d-array/"},
+      {"id": "p1_2", "name": "Defanging an IP Address", "url": "https://leetcode.com/problems/defanging-an-ip-address/"},
+      {"id": "p1_3", "name": "Score of a String", "url": "https://leetcode.com/problems/score-of-a-string/"},
+      {"id": "p1_4", "name": "Convert the Temperature", "url": "https://leetcode.com/problems/convert-the-temperature/"}
+    ]
+  },
+  {
+    "id": 2,
+    "title": "Part 2: Control Flow Mastery",
+    "topics": "Looping patterns, Enumerate, Zip, For-Else clauses, Switch (Match) cases",
+    "learnLink": "https://chat.openai.com/?q=Explain+advanced+Python+control+flow+for+coding+interviews.+Deep+dive+into+'enumerate'+vs+'range(len())'+and+using+'zip'+for+parallel+iteration.+Explain+the+rarely+used+'for-else'+loop+with+a+practical+example.+Explain+Python+3.10+Structural+Pattern+Matching.+Share+optimization+tips.",
+    "problems": [
+      {"id": "p2_1", "name": "Fizz Buzz", "url": "https://leetcode.com/problems/fizz-buzz/"},
+      {"id": "p2_2", "name": "Power of Two", "url": "https://leetcode.com/problems/power-of-two/"},
+      {"id": "p2_3", "name": "Fibonacci Number", "url": "https://leetcode.com/problems/fibonacci-number/"},
+      {"id": "p2_4", "name": "Self Dividing Numbers", "url": "https://leetcode.com/problems/self-dividing-numbers/"}
+    ]
+  },
+  {
+    "id": 3,
+    "title": "Part 3: List Internals & Slicing",
+    "topics": "Dynamic Array sizing, Time Complexity of operations, Slicing nuances, Copying",
+    "learnLink": "https://chat.openai.com/?q=Deep+dive+into+Python+Lists+implementation+as+Dynamic+Arrays.+Visualize+how+Python+allocates+extra+space+during+append.+Explain+Time+Complexity+of+pop(0)+vs+pop().+Explain+slicing+[start:stop:step]+and+how+to+reverse+lists.+Explain+shallow+vs+deep+copy+with+nested+lists.",
+    "problems": [
+      {"id": "p3_1", "name": "Concatenation of Array", "url": "https://leetcode.com/problems/concatenation-of-array/"},
+      {"id": "p3_2", "name": "Build Array from Permutation", "url": "https://leetcode.com/problems/build-array-from-permutation/"},
+      {"id": "p3_3", "name": "Shuffle the Array", "url": "https://leetcode.com/problems/shuffle-the-array/"},
+      {"id": "p3_4", "name": "Kids With the Greatest Number of Candies", "url": "https://leetcode.com/problems/kids-with-the-greatest-number-of-candies/"}
+    ]
+  },
+  {
+    "id": 4,
+    "title": "Part 4: String Manipulation & ASCII",
+    "topics": "Immutability, Buffer storage, Join vs +, Ord/Chr methods",
+    "learnLink": "https://chat.openai.com/?q=Master+Python+Strings+for+LeetCode.+Explain+why+strings+are+immutable+and+the+cost+of+concatenation+in+loops+vs+using+'.join()'.+Teach+ASCII+manipulation+using+'ord'+and+'chr'+for+alphabet+problems.+Explain+string+formatting+f-strings+best+practices.",
+    "problems": [
+      {"id": "p4_1", "name": "Jewels and Stones", "url": "https://leetcode.com/problems/jewels-and-stones/"},
+      {"id": "p4_2", "name": "Final Value of Variable After Operations", "url": "https://leetcode.com/problems/final-value-of-variable-after-operations/"},
+      {"id": "p4_3", "name": "To Lower Case", "url": "https://leetcode.com/problems/to-lower-case/"},
+      {"id": "p4_4", "name": "Sorting the Sentence", "url": "https://leetcode.com/problems/sorting-the-sentence/"}
+    ]
+  },
+  {
+    "id": 5,
+    "title": "Part 5: Dictionaries & Hashing",
+    "topics": "Hash Maps, Collision handling, Defaultdict, Counter, Iteration",
+    "learnLink": "https://chat.openai.com/?q=Explain+Python+Dictionaries+under+the+hood.+How+does+hashing+and+collision+resolution+work+in+Python?+Teach+me+how+to+use+'collections.defaultdict'+and+'collections.Counter'+to+simplify+code.+Show+efficient+ways+to+iterate+keys+values+and+items+simultaneously.",
+    "problems": [
+      {"id": "p5_1", "name": "Two Sum", "url": "https://leetcode.com/problems/two-sum/"},
+      {"id": "p5_2", "name": "Number of Good Pairs", "url": "https://leetcode.com/problems/number-of-good-pairs/"},
+      {"id": "p5_3", "name": "How Many Numbers Are Smaller Than the Current Number", "url": "https://leetcode.com/problems/how-many-numbers-are-smaller-than-the-current-number/"},
+      {"id": "p5_4", "name": "Decode the Message", "url": "https://leetcode.com/problems/decode-the-message/"}
+    ]
+  },
+  {
+    "id": 6,
+    "title": "Part 6: Sets & Pythonic One-Liners",
+    "topics": "Set Theory (Union/Intersection), List Comprehensions, Generator Expressions",
+    "learnLink": "https://chat.openai.com/?q=Explain+Python+Sets+for+algorithm+optimization.+Show+time+complexity+of+set+lookups+vs+lists.+Teach+List+Comprehensions+and+Dictionary+Comprehensions+for+cleaner+code.+Explain+the+difference+between+Generators+()+'and+List+Comps+[]+in+terms+of+memory.",
+    "problems": [
+      {"id": "p6_1", "name": "Contains Duplicate", "url": "https://leetcode.com/problems/contains-duplicate/"},
+      {"id": "p6_2", "name": "Sum of Unique Elements", "url": "https://leetcode.com/problems/sum-of-unique-elements/"},
+      {"id": "p6_3", "name": "Intersection of Two Arrays", "url": "https://leetcode.com/problems/intersection-of-two-arrays/"},
+      {"id": "p6_4", "name": "Find the Difference", "url": "https://leetcode.com/problems/find-the-difference/"}
+    ]
+  },
+  {
+    "id": 7,
+    "title": "Part 7: Functions & Scope",
+    "topics": "Scope (LEGB), Global/Nonlocal, Lambda, Higher-Order Functions",
+    "learnLink": "https://chat.openai.com/?q=Explain+Python+Scope+(LEGB+rule)+with+examples.+What+is+the+difference+between+global+and+nonlocal+keywords?+Teach+Lambda+functions+and+how+to+use+them+inside+functions+like+map+filter+and+sorted.+Explain+closures.",
+    "problems": [
+      {"id": "p7_1", "name": "Missing Number", "url": "https://leetcode.com/problems/missing-number/"},
+      {"id": "p7_2", "name": "Majority Element", "url": "https://leetcode.com/problems/majority-element/"},
+      {"id": "p7_3", "name": "Move Zeroes", "url": "https://leetcode.com/problems/move-zeroes/"},
+      {"id": "p7_4", "name": "Plus One", "url": "https://leetcode.com/problems/plus-one/"}
+    ]
+  },
+  {
+    "id": 8,
+    "title": "Part 8: OOP for Interviews",
+    "topics": "Classes, Self, Init, Dunder Methods (__str__, __repr__, __eq__), Inheritance",
+    "learnLink": "https://chat.openai.com/?q=Explain+Python+Object+Oriented+Programming+for+coding+interviews.+Focus+on+'__init__',+'self',+and+dunder+methods+like+'__str__'+and+'__eq__'.+Explain+how+to+implement+a+custom+comparator+using+OOP.+Provide+a+code+snippet+for+a+simple+Design+class.",
+    "problems": [
+      {"id": "p8_1", "name": "Design Parking System", "url": "https://leetcode.com/problems/design-parking-system/"},
+      {"id": "p8_2", "name": "Design HashSet", "url": "https://leetcode.com/problems/design-hashset/"},
+      {"id": "p8_3", "name": "Design HashMap", "url": "https://leetcode.com/problems/design-hashmap/"},
+      {"id": "p8_4", "name": "Design an Ordered Stream", "url": "https://leetcode.com/problems/design-an-ordered-stream/"}
+    ]
+  },
+  {
+    "id": 9,
+    "title": "Part 9: Recursion Basics",
+    "topics": "Base Case, Recursive Step, Call Stack Visualization",
+    "learnLink": "https://chat.openai.com/?q=Teach+Recursion+in+Python+visually.+Explain+the+Call+Stack+and+Stack+Overflow.+Show+how+to+identify+the+Base+Case+and+Recursive+Step.+Walk+through+calculating+Factorial+and+Fibonacci+with+a+stack+diagram.",
+    "problems": [
+      {"id": "p9_1", "name": "Fibonacci Number", "url": "https://leetcode.com/problems/fibonacci-number/"},
+      {"id": "p9_2", "name": "Power of Three", "url": "https://leetcode.com/problems/power-of-three/"},
+      {"id": "p9_3", "name": "Power of Four", "url": "https://leetcode.com/problems/power-of-four/"},
+      {"id": "p9_4", "name": "K-th Symbol in Grammar", "url": "https://leetcode.com/problems/k-th-symbol-in-grammar/"}
+    ]
+  },
+  {
+    "id": 10,
+    "title": "Part 10: Big O & Complexity Analysis",
+    "topics": "Time Complexity, Space Complexity, Logarithmic Time, Amortized Time",
+    "learnLink": "https://chat.openai.com/?q=Explain+Big+O+Notation+specifically+for+Python+operations.+What+is+the+complexity+of+len(),+list.sort(),+set+lookup,+and+dict+insertion?+Explain+O(log+n)+and+Amortized+analysis.+Provide+examples+of+loops+and+their+complexities.",
+    "problems": [
+      {"id": "p10_1", "name": "Big O Analysis Practice (No specific LC)", "url": "https://leetcode.com/problemset/all/"}
+    ]
+  },
+  {
+    "id": 11,
+    "title": "Part 11: Binary Search Fundamentals",
+    "topics": "Search Space, Midpoint Calculation, Overflow safety (Python handles it, but concept matters)",
+    "learnLink": "https://chat.openai.com/?q=Explain+Binary+Search+algorithm.+Why+is+it+O(log+n)?+Show+the+iterative+implementation+in+Python.+Explain+the+boundary+conditions+(left+<=+right)+and+calculating+midpoint.+Visualize+searching+in+a+sorted+array.",
+    "problems": [
+      {"id": "p11_1", "name": "Binary Search", "url": "https://leetcode.com/problems/binary-search/"},
+      {"id": "p11_2", "name": "Search Insert Position", "url": "https://leetcode.com/problems/search-insert-position/"},
+      {"id": "p11_3", "name": "First Bad Version", "url": "https://leetcode.com/problems/first-bad-version/"},
+      {"id": "p11_4", "name": "Arranging Coins", "url": "https://leetcode.com/problems/arranging-coins/"}
+    ]
+  },
+  {
+    "id": 12,
+    "title": "Part 12: Basic Sorting Algorithms",
+    "topics": "Bubble, Selection, Insertion (Conceptual), Python's Timsort",
+    "learnLink": "https://chat.openai.com/?q=Explain+how+Python's+'sort()'+and+'sorted()'+work+(Timsort).+Briefly+explain+Bubble,+Selection,+and+Insertion+sort+logic+for+foundational+knowledge,+but+focus+on+when+to+use+built-in+sort.+Explain+custom+sort+keys+using+lambda.",
+    "problems": [
+      {"id": "p12_1", "name": "Sort Colors", "url": "https://leetcode.com/problems/sort-colors/"},
+      {"id": "p12_2", "name": "Majority Element", "url": "https://leetcode.com/problems/majority-element/"},
+      {"id": "p12_3", "name": "Height Checker", "url": "https://leetcode.com/problems/height-checker/"},
+      {"id": "p12_4", "name": "Sort Array by Parity", "url": "https://leetcode.com/problems/sort-array-by-parity/"}
+    ]
+  },
+  {
+    "id": 13,
+    "title": "Part 13: Arrays & Hashing - The Basics",
+    "topics": "Array traversal, Hash Map for counting, Lookup tables",
+    "learnLink": "https://chat.openai.com/?q=Explain+the+'Arrays+and+Hashing'+pattern+for+coding+interviews.+How+to+replace+nested+loops+O(n^2)+with+Hash+Maps+O(n)+for+lookups.+Walk+through+the+Two+Sum+problem+optimization+step-by-step.",
+    "problems": [
+      {"id": "p13_1", "name": "Contains Duplicate", "url": "https://leetcode.com/problems/contains-duplicate/"},
+      {"id": "p13_2", "name": "Valid Anagram", "url": "https://leetcode.com/problems/valid-anagram/"},
+      {"id": "p13_3", "name": "Replace Elements with Greatest Element on Right Side", "url": "https://leetcode.com/problems/replace-elements-with-greatest-element-on-right-side/"},
+      {"id": "p13_4", "name": "Group Anagrams", "url": "https://leetcode.com/problems/group-anagrams/"}
+    ]
+  },
+  {
+    "id": 14,
+    "title": "Part 14: Arrays & Hashing - Prefix Sums",
+    "topics": "Cumulative Sum, Range Sum Queries, Subarray Sums",
+    "learnLink": "https://chat.openai.com/?q=Explain+the+Prefix+Sum+technique+in+algorithms.+How+does+it+allow+O(1)+range+sum+queries?+Provide+a+Python+example+of+building+a+prefix+sum+array+and+using+it.+Show+application+in+subarray+sum+problems.",
+    "problems": [
+      {"id": "p14_1", "name": "Range Sum Query - Immutable", "url": "https://leetcode.com/problems/range-sum-query-immutable/"},
+      {"id": "p14_2", "name": "Find Pivot Index", "url": "https://leetcode.com/problems/find-pivot-index/"},
+      {"id": "p14_3", "name": "Subarray Sum Equals K", "url": "https://leetcode.com/problems/subarray-sum-equals-k/"},
+      {"id": "p14_4", "name": "Contiguous Array", "url": "https://leetcode.com/problems/contiguous-array/"},
+      {"id": "p14_5", "name": "Product of Array Except Self", "url": "https://leetcode.com/problems/product-of-array-except-self/"}
+    ]
+  },
+  {
+    "id": 15,
+    "title": "Part 15: Arrays - Product & Logic",
+    "topics": "Pre-computation, Post-computation, Array Logic without Division",
+    "learnLink": "https://chat.openai.com/?q=Explain+how+to+solve+'Product+of+Array+Except+Self'+without+division.+Explain+the+concept+of+prefix+product+and+suffix+product+arrays.+Visualize+the+passes+needed+to+construct+the+result.",
+    "problems": [
+      {"id": "p15_1", "name": "Product of Array Except Self", "url": "https://leetcode.com/problems/product-of-array-except-self/"},
+      {"id": "p15_2", "name": "Longest Consecutive Sequence", "url": "https://leetcode.com/problems/longest-consecutive-sequence/"},
+      {"id": "p15_3", "name": "Top K Frequent Elements", "url": "https://leetcode.com/problems/top-k-frequent-elements/"},
+      {"id": "p15_4", "name": "Subarray Sums Divisible by K", "url": "https://leetcode.com/problems/subarray-sums-divisible-by-k/"}
+    ]
+  },
+  {
+    "id": 16,
+    "title": "Part 16: Two Pointers - Collision Strategy",
+    "topics": "Left & Right pointers, Sorted Array traversal, Palindromes",
+    "learnLink": "https://chat.openai.com/?q=Explain+the+Two+Pointers+technique+(Collision)+where+start+and+end+pointers+move+towards+the+center.+Why+does+this+require+sorted+arrays+usually?+Walk+through+checking+a+palindrome+and+Two+Sum+II.",
+    "problems": [
+      {"id": "p16_1", "name": "Valid Palindrome", "url": "https://leetcode.com/problems/valid-palindrome/"},
+      {"id": "p16_2", "name": "Two Sum II - Input Array Is Sorted", "url": "https://leetcode.com/problems/two-sum-ii-input-array-is-sorted/"},
+      {"id": "p16_3", "name": "Reverse String", "url": "https://leetcode.com/problems/reverse-string/"},
+      {"id": "p16_4", "name": "Move Zeroes", "url": "https://leetcode.com/problems/move-zeroes/"}
+    ]
+  },
+  {
+    "id": 17,
+    "title": "Part 17: Two Pointers - 3Sum Variation",
+    "topics": "Fixing one pointer, moving two, Deduplication logic",
+    "learnLink": "https://chat.openai.com/?q=Explain+the+3Sum+problem+approach+using+sorting+and+Two+Pointers.+How+do+we+avoid+duplicates+efficiently?+Provide+pseudocode+and+Python+implementation+handling+edge+cases.",
+    "problems": [
+      {"id": "p17_1", "name": "3Sum", "url": "https://leetcode.com/problems/3sum/"},
+      {"id": "p17_2", "name": "3Sum Closest", "url": "https://leetcode.com/problems/3sum-closest/"},
+      {"id": "p17_3", "name": "4Sum", "url": "https://leetcode.com/problems/4sum/"},
+      {"id": "p17_4", "name": "Number of Subsequences That Satisfy the Given Sum Condition", "url": "https://leetcode.com/problems/number-of-subsequences-that-satisfy-the-given-sum-condition/"}
+    ]
+  },
+  {
+    "id": 18,
+    "title": "Part 18: Two Pointers - Container Water",
+    "topics": "Greedy Pointer Movement, Area Maximization",
+    "learnLink": "https://chat.openai.com/?q=Explain+the+'Container+With+Most+Water'+problem.+Why+is+it+a+Two+Pointer+problem?+Explain+the+greedy+logic:+why+do+we+move+the+shorter+pointer?+Prove+why+this+works.",
+    "problems": [
+      {"id": "p18_1", "name": "Container With Most Water", "url": "https://leetcode.com/problems/container-with-most-water/"},
+      {"id": "p18_2", "name": "Trapping Rain Water", "url": "https://leetcode.com/problems/trapping-rain-water/"},
+      {"id": "p18_3", "name": "Squares of a Sorted Array", "url": "https://leetcode.com/problems/squares-of-a-sorted-array/"},
+      {"id": "p18_4", "name": "Boats to Save People", "url": "https://leetcode.com/problems/boats-to-save-people/"}
+    ]
+  },
+  {
+    "id": 19,
+    "title": "Part 19: Sliding Window - Fixed Size",
+    "topics": "Subarray of size K, Window Sum, reusing previous computations",
+    "learnLink": "https://chat.openai.com/?q=Explain+the+Fixed+Size+Sliding+Window+technique.+How+do+we+maintain+a+window+of+size+k?+Show+how+to+update+the+window+sum+by+subtracting+the+element+leaving+and+adding+the+new+element+O(1).",
+    "problems": [
+      {"id": "p19_1", "name": "Maximum Average Subarray I", "url": "https://leetcode.com/problems/maximum-average-subarray-i/"},
+      {"id": "p19_2", "name": "Number of Sub-arrays of Size K and Average Greater than or Equal to Threshold", "url": "https://leetcode.com/problems/number-of-sub-arrays-of-size-k-and-average-greater-than-or-equal-to-threshold/"},
+      {"id": "p19_3", "name": "Permutation in String", "url": "https://leetcode.com/problems/permutation-in-string/"},
+      {"id": "p19_4", "name": "Find All Anagrams in a String", "url": "https://leetcode.com/problems/find-all-anagrams-in-a-string/"}
+    ]
+  },
+  {
+    "id": 20,
+    "title": "Part 20: Sliding Window - Variable Size",
+    "topics": "Dynamic window resizing, 'Expand right, Shrink left' pattern",
+    "learnLink": "https://chat.openai.com/?q=Explain+the+Variable+Size+Sliding+Window+technique.+When+do+we+expand+the+window+and+when+do+we+shrink+it?+Walk+through+'Minimum+Size+Subarray+Sum'+explaining+the+while+loop+condition+for+shrinking.",
+    "problems": [
+      {"id": "p20_1", "name": "Minimum Size Subarray Sum", "url": "https://leetcode.com/problems/minimum-size-subarray-sum/"},
+      {"id": "p20_2", "name": "Longest Substring Without Repeating Characters", "url": "https://leetcode.com/problems/longest-substring-without-repeating-characters/"},
+      {"id": "p20_3", "name": "Max Consecutive Ones III", "url": "https://leetcode.com/problems/max-consecutive-ones-iii/"},
+      {"id": "p20_4", "name": "Fruit Into Baskets", "url": "https://leetcode.com/problems/fruit-into-baskets/"}
+    ]
+  },
+  {
+    "id": 21,
+    "title": "Part 21: Sliding Window - Advanced",
+    "topics": "Window with HashMaps/Counters, Character frequency requirements",
+    "learnLink": "https://chat.openai.com/?q=Deep+dive+into+Sliding+Window+problems+involving+HashMaps+or+Counters.+Explain+how+to+solve+'Minimum+Window+Substring'.+How+do+we+track+'have'+vs+'need'+character+counts+efficiently?",
+    "problems": [
+      {"id": "p21_1", "name": "Minimum Window Substring", "url": "https://leetcode.com/problems/minimum-window-substring/"},
+      {"id": "p21_2", "name": "Longest Repeating Character Replacement", "url": "https://leetcode.com/problems/longest-repeating-character-replacement/"},
+      {"id": "p21_3", "name": "Sliding Window Maximum", "url": "https://leetcode.com/problems/sliding-window-maximum/"},
+      {"id": "p21_4", "name": "Subarrays with K Different Integers", "url": "https://leetcode.com/problems/subarrays-with-k-different-integers/"}
+    ]
+  },
+  {
+    "id": 22,
+    "title": "Part 22: Stack - LIFO & Logic",
+    "topics": "Last-In-First-Out, Matching Parentheses, History tracking",
+    "learnLink": "https://chat.openai.com/?q=Explain+the+Stack+data+structure+and+its+LIFO+property.+How+is+it+implemented+in+Python+(Lists)?+Walk+through+the+'Valid+Parentheses'+problem+visualizing+push+and+pop+operations.",
+    "problems": [
+      {"id": "p22_1", "name": "Valid Parentheses", "url": "https://leetcode.com/problems/valid-parentheses/"},
+      {"id": "p22_2", "name": "Baseball Game", "url": "https://leetcode.com/problems/baseball-game/"},
+      {"id": "p22_3", "name": "Backspace String Compare", "url": "https://leetcode.com/problems/backspace-string-compare/"},
+      {"id": "p22_4", "name": "Simplify Path", "url": "https://leetcode.com/problems/simplify-path/"}
+    ]
+  },
+  {
+    "id": 23,
+    "title": "Part 23: Stack - Min Stack Pattern",
+    "topics": "Design patterns, Auxiliary Stack, O(1) retrieval",
+    "learnLink": "https://chat.openai.com/?q=Explain+how+to+design+a+Stack+that+supports+getMin()+in+O(1)+time.+Why+do+we+need+an+auxiliary+stack?+Explain+the+logic+of+pushing+to+the+min-stack+only+when+values+are+smaller.",
+    "problems": [
+      {"id": "p23_1", "name": "Min Stack", "url": "https://leetcode.com/problems/min-stack/"},
+      {"id": "p23_2", "name": "Evaluate Reverse Polish Notation", "url": "https://leetcode.com/problems/evaluate-reverse-polish-notation/"},
+      {"id": "p23_3", "name": "Generate Parentheses", "url": "https://leetcode.com/problems/generate-parentheses/"},
+      {"id": "p23_4", "name": "Daily Temperatures", "url": "https://leetcode.com/problems/daily-temperatures/"}
+    ]
+  },
+  {
+    "id": 24,
+    "title": "Part 24: Monotonic Stack",
+    "topics": "Next Greater Element, Previous Smaller Element, Maintaining Order",
+    "learnLink": "https://chat.openai.com/?q=Explain+the+Monotonic+Stack+pattern.+What+problem+does+it+solve?+(Next+Greater+Element).+Visualize+how+we+maintain+a+decreasing+or+increasing+stack+to+find+boundaries.",
+    "problems": [
+      {"id": "p24_1", "name": "Daily Temperatures", "url": "https://leetcode.com/problems/daily-temperatures/"},
+      {"id": "p24_2", "name": "Next Greater Element I", "url": "https://leetcode.com/problems/next-greater-element-i/"},
+      {"id": "p24_3", "name": "Largest Rectangle in Histogram", "url": "https://leetcode.com/problems/largest-rectangle-in-histogram/"},
+      {"id": "p24_4", "name": "Online Stock Span", "url": "https://leetcode.com/problems/online-stock-span/"}
+    ]
+  },
+  {
+    "id": 25,
+    "title": "Part 25: Queues & Deques",
+    "topics": "FIFO, Collections.deque, Sliding Window Optimization",
+    "learnLink": "https://chat.openai.com/?q=Explain+the+Queue+data+structure+and+Python's+'collections.deque'.+Why+is+list.pop(0)+O(n)+while+deque.popleft()+is+O(1)?+Explain+how+Deques+are+used+in+Sliding+Window+Maximum.",
+    "problems": [
+      {"id": "p25_1", "name": "Implement Queue using Stacks", "url": "https://leetcode.com/problems/implement-queue-using-stacks/"},
+      {"id": "p25_2", "name": "Number of Recent Calls", "url": "https://leetcode.com/problems/number-of-recent-calls/"},
+      {"id": "p25_3", "name": "Dota2 Senate", "url": "https://leetcode.com/problems/dota2-senate/"},
+      {"id": "p25_4", "name": "Design Circular Queue", "url": "https://leetcode.com/problems/design-circular-queue/"}
+    ]
+  },
+  {
+    "id": 26,
+    "title": "Part 26: Binary Search - 2D Matrices",
+    "topics": "Treating 2D as 1D, Row/Col elimination",
+    "learnLink": "https://chat.openai.com/?q=Explain+how+to+perform+Binary+Search+on+a+2D+Matrix.+How+can+we+treat+a+sorted+matrix+as+a+flattened+sorted+array+without+actually+flattening+it?+Also+explain+the+O(m+n)+staircase+search.",
+    "problems": [
+      {"id": "p26_1", "name": "Search a 2D Matrix", "url": "https://leetcode.com/problems/search-a-2d-matrix/"},
+      {"id": "p26_2", "name": "Search a 2D Matrix II", "url": "https://leetcode.com/problems/search-a-2d-matrix-ii/"},
+      {"id": "p26_3", "name": "Kth Smallest Element in a Sorted Matrix", "url": "https://leetcode.com/problems/kth-smallest-element-in-a-sorted-matrix/"},
+      {"id": "p26_4", "name": "Count Negative Numbers in a Sorted Matrix", "url": "https://leetcode.com/problems/count-negative-numbers-in-a-sorted-matrix/"}
+    ]
+  },
+  {
+    "id": 27,
+    "title": "Part 27: Binary Search - On Answer Space",
+    "topics": "Koko Eating Bananas, Minimizing Max, Range checking",
+    "learnLink": "https://chat.openai.com/?q=Explain+Binary+Search+on+Answer+Space.+How+do+we+recognize+this+pattern?+(e.g.,+'Koko+Eating+Bananas').+Explain+how+to+define+the+search+space+(min+to+max+possible+values)+and+the+feasibility+function.",
+    "problems": [
+      {"id": "p27_1", "name": "Koko Eating Bananas", "url": "https://leetcode.com/problems/koko-eating-bananas/"},
+      {"id": "p27_2", "name": "Capacity To Ship Packages Within D Days", "url": "https://leetcode.com/problems/capacity-to-ship-packages-within-d-days/"},
+      {"id": "p27_3", "name": "Split Array Largest Sum", "url": "https://leetcode.com/problems/split-array-largest-sum/"},
+      {"id": "p27_4", "name": "Minimum Number of Days to Make m Bouquets", "url": "https://leetcode.com/problems/minimum-number-of-days-to-make-m-bouquets/"}
+    ]
+  },
+  {
+    "id": 28,
+    "title": "Part 28: Binary Search - Rotated Arrays",
+    "topics": "Finding pivot, Modified Binary Search logic",
+    "learnLink": "https://chat.openai.com/?q=Explain+how+to+search+in+a+Rotated+Sorted+Array+in+O(log+n).+How+do+we+determine+which+half+of+the+array+is+sorted?+Walk+through+the+logic+of+adjusting+left+and+right+pointers.",
+    "problems": [
+      {"id": "p28_1", "name": "Search in Rotated Sorted Array", "url": "https://leetcode.com/problems/search-in-rotated-sorted-array/"},
+      {"id": "p28_2", "name": "Find Minimum in Rotated Sorted Array", "url": "https://leetcode.com/problems/find-minimum-in-rotated-sorted-array/"},
+      {"id": "p28_3", "name": "Search in Rotated Sorted Array II", "url": "https://leetcode.com/problems/search-in-rotated-sorted-array-ii/"},
+      {"id": "p28_4", "name": "Find Peak Element", "url": "https://leetcode.com/problems/find-peak-element/"}
+    ]
+  },
+  {
+    "id": 29,
+    "title": "Part 29: Linked List - Fundamentals",
+    "topics": "Nodes, Pointers, Traversal, Insertion, Deletion",
+    "learnLink": "https://chat.openai.com/?q=Explain+Singly+Linked+Lists+in+Python.+How+to+define+a+ListNode+class?+Visualize+inserting+and+deleting+nodes+at+the+beginning,+middle,+and+end.+Why+is+access+O(n)?",
+    "problems": [
+      {"id": "p29_1", "name": "Reverse Linked List", "url": "https://leetcode.com/problems/reverse-linked-list/"},
+      {"id": "p29_2", "name": "Merge Two Sorted Lists", "url": "https://leetcode.com/problems/merge-two-sorted-lists/"},
+      {"id": "p29_3", "name": "Palindrome Linked List", "url": "https://leetcode.com/problems/palindrome-linked-list/"},
+      {"id": "p29_4", "name": "Remove Linked List Elements", "url": "https://leetcode.com/problems/remove-linked-list-elements/"}
+    ]
+  },
+  {
+    "id": 30,
+    "title": "Part 30: Linked List - Two Pointers",
+    "topics": "Fast & Slow Pointers, Cycle Detection, Middle finding",
+    "learnLink": "https://chat.openai.com/?q=Explain+the+Fast+and+Slow+Pointer+technique+(Tortoise+and+Hare)+for+Linked+Lists.+How+does+it+detect+cycles+(Floyd's+Cycle-Finding)?+How+does+it+find+the+middle+of+the+list?",
+    "problems": [
+      {"id": "p30_1", "name": "Linked List Cycle", "url": "https://leetcode.com/problems/linked-list-cycle/"},
+      {"id": "p30_2", "name": "Middle of the Linked List", "url": "https://leetcode.com/problems/middle-of-the-linked-list/"},
+      {"id": "p30_3", "name": "Remove Nth Node From End of List", "url": "https://leetcode.com/problems/remove-nth-node-from-end-of-list/"},
+      {"id": "p30_4", "name": "Reorder List", "url": "https://leetcode.com/problems/reorder-list/"},
+      {"id": "p30_5", "name": "Intersection of Two Linked Lists", "url": "https://leetcode.com/problems/intersection-of-two-linked-lists/"}
+    ]
+  },
+  {
+    "id": 31,
+    "title": "Part 31: Linked List - Advanced Ops",
+    "topics": "Reordering, Deep Copy, LRU Cache concept",
+    "learnLink": "https://chat.openai.com/?q=Explain+how+to+Reorder+a+Linked+List+(split,+reverse,+merge).+Explain+how+to+Deep+Copy+a+list+with+random+pointers.+Briefly+explain+Doubly+Linked+Lists+and+their+role+in+LRU+Cache.",
+    "problems": [
+      {"id": "p31_1", "name": "Reorder List", "url": "https://leetcode.com/problems/reorder-list/"},
+      {"id": "p31_2", "name": "Copy List with Random Pointer", "url": "https://leetcode.com/problems/copy-list-with-random-pointer/"},
+      {"id": "p31_3", "name": "Add Two Numbers", "url": "https://leetcode.com/problems/add-two-numbers/"},
+      {"id": "p31_4", "name": "Swap Nodes in Pairs", "url": "https://leetcode.com/problems/swap-nodes-in-pairs/"}
+    ]
+  },
+  {
+    "id": 32,
+    "title": "Part 32: Trees - Recursive Traversal",
+    "topics": "Binary Trees, Pre-order, In-order, Post-order (Recursive)",
+    "learnLink": "https://chat.openai.com/?q=Explain+Binary+Trees+and+Recursive+DFS+Traversals+(Inorder,+Preorder,+Postorder).+Provide+Python+code+for+each.+Visually+trace+the+recursion+stack+for+a+simple+tree.",
+    "problems": [
+      {"id": "p32_1", "name": "Binary Tree Inorder Traversal", "url": "https://leetcode.com/problems/binary-tree-inorder-traversal/"},
+      {"id": "p32_2", "name": "Maximum Depth of Binary Tree", "url": "https://leetcode.com/problems/maximum-depth-of-binary-tree/"},
+      {"id": "p32_3", "name": "Invert Binary Tree", "url": "https://leetcode.com/problems/invert-binary-tree/"},
+      {"id": "p32_4", "name": "Same Tree", "url": "https://leetcode.com/problems/same-tree/"}
+    ]
+  },
+  {
+    "id": 33,
+    "title": "Part 33: Trees - Iterative Traversal",
+    "topics": "Stack-based DFS, Simulating Recursion",
+    "learnLink": "https://chat.openai.com/?q=Explain+how+to+implement+Tree+Traversals+Iteratively+using+a+Stack.+Why+might+we+want+iterative+over+recursive?+Walk+through+Preorder+traversal+iteratively.",
+    "problems": [
+      {"id": "p33_1", "name": "Binary Tree Preorder Traversal", "url": "https://leetcode.com/problems/binary-tree-preorder-traversal/"},
+      {"id": "p33_2", "name": "Binary Tree Postorder Traversal", "url": "https://leetcode.com/problems/binary-tree-postorder-traversal/"},
+      {"id": "p33_3", "name": "Symmetric Tree", "url": "https://leetcode.com/problems/symmetric-tree/"},
+      {"id": "p33_4", "name": "Balanced Binary Tree", "url": "https://leetcode.com/problems/balanced-binary-tree/"}
+    ]
+  },
+  {
+    "id": 34,
+    "title": "Part 34: Trees - Breadth First Search",
+    "topics": "Level Order Traversal, Queue usage",
+    "learnLink": "https://chat.openai.com/?q=Explain+Level+Order+Traversal+(BFS)+for+Binary+Trees.+How+do+we+use+a+Queue?+Show+the+Python+code+to+print+nodes+level+by+level.",
+    "problems": [
+      {"id": "p34_1", "name": "Binary Tree Level Order Traversal", "url": "https://leetcode.com/problems/binary-tree-level-order-traversal/"},
+      {"id": "p34_2", "name": "Binary Tree Right Side View", "url": "https://leetcode.com/problems/binary-tree-right-side-view/"},
+      {"id": "p34_3", "name": "Average of Levels in Binary Tree", "url": "https://leetcode.com/problems/average-of-levels-in-binary-tree/"},
+      {"id": "p34_4", "name": "Zigzag Level Order Traversal", "url": "https://leetcode.com/problems/binary-tree-zigzag-level-order-traversal/"}
+    ]
+  },
+  {
+    "id": 35,
+    "title": "Part 35: Binary Search Trees (BST)",
+    "topics": "BST Properties, Validation, Insertion, Search",
+    "learnLink": "https://chat.openai.com/?q=Explain+Binary+Search+Trees+(BST)+and+their+properties.+Why+is+search+O(log+n)?+How+do+you+Validate+if+a+tree+is+a+BST?(Careful+with+ranges).+Explain+LCA+in+a+BST.",
+    "problems": [
+      {"id": "p35_1", "name": "Search in a Binary Search Tree", "url": "https://leetcode.com/problems/search-in-a-binary-search-tree/"},
+      {"id": "p35_2", "name": "Validate Binary Search Tree", "url": "https://leetcode.com/problems/validate-binary-search-tree/"},
+      {"id": "p35_3", "name": "Lowest Common Ancestor of a Binary Search Tree", "url": "https://leetcode.com/problems/lowest-common-ancestor-of-a-binary-search-tree/"},
+      {"id": "p35_4", "name": "Insert into a Binary Search Tree", "url": "https://leetcode.com/problems/insert-into-a-binary-search-tree/"}
+    ]
+  },
+  {
+    "id": 36,
+    "title": "Part 36: Trees - Construction & Modification",
+    "topics": "Building from arrays, Serializing, Deserializing",
+    "learnLink": "https://chat.openai.com/?q=Explain+how+to+Construct+a+Binary+Tree+from+Preorder+and+Inorder+arrays.+Explain+the+logic+of+finding+the+root+and+splitting+arrays.+Also+explain+Serialization+and+Deserialization.",
+    "problems": [
+      {"id": "p36_1", "name": "Construct Binary Tree from Preorder and Inorder Traversal", "url": "https://leetcode.com/problems/construct-binary-tree-from-preorder-and-inorder-traversal/"},
+      {"id": "p36_2", "name": "Serialize and Deserialize Binary Tree", "url": "https://leetcode.com/problems/serialize-and-deserialize-binary-tree/"},
+      {"id": "p36_3", "name": "Diameter of Binary Tree", "url": "https://leetcode.com/problems/diameter-of-binary-tree/"},
+      {"id": "p36_4", "name": "Construct Binary Tree from Inorder and Postorder Traversal", "url": "https://leetcode.com/problems/construct-binary-tree-from-inorder-and-postorder-traversal/"}
+    ]
+  },
+  {
+    "id": 37,
+    "title": "Part 37: Trees - Path Problems",
+    "topics": "Path Sum, Max Path Sum, Backtracking on Trees",
+    "learnLink": "https://chat.openai.com/?q=Explain+Tree+Path+problems.+How+to+solve+'Path+Sum'+and+the+harder+'Binary+Tree+Maximum+Path+Sum'.+Explain+how+returns+work+in+recursion+vs+updating+a+global+maximum.",
+    "problems": [
+      {"id": "p37_1", "name": "Path Sum", "url": "https://leetcode.com/problems/path-sum/"},
+      {"id": "p37_2", "name": "Binary Tree Maximum Path Sum", "url": "https://leetcode.com/problems/binary-tree-maximum-path-sum/"},
+      {"id": "p37_3", "name": "Count Good Nodes in Binary Tree", "url": "https://leetcode.com/problems/count-good-nodes-in-binary-tree/"},
+      {"id": "p37_4", "name": "Path Sum II", "url": "https://leetcode.com/problems/path-sum-ii/"},
+      {"id": "p37_5", "name": "Path Sum III", "url": "https://leetcode.com/problems/path-sum-iii/"}
+    ]
+  },
+  {
+    "id": 38,
+    "title": "Part 38: Heaps & Priority Queues - Basics",
+    "topics": "Min Heap vs Max Heap, heapq module, Insertion/Deletion",
+    "learnLink": "https://chat.openai.com/?q=Explain+Heaps+and+Priority+Queues.+How+does+Python's+'heapq'+module+work+(Min+Heap+default)?+How+to+simulate+a+Max+Heap?+Explain+Time+Complexity+of+heapify,+heappush,+and+heappop.",
+    "problems": [
+      {"id": "p38_1", "name": "Kth Largest Element in a Stream", "url": "https://leetcode.com/problems/kth-largest-element-in-a-stream/"},
+      {"id": "p38_2", "name": "Last Stone Weight", "url": "https://leetcode.com/problems/last-stone-weight/"},
+      {"id": "p38_3", "name": "Kth Largest Element in an Array", "url": "https://leetcode.com/problems/kth-largest-element-in-an-array/"},
+      {"id": "p38_4", "name": "K Closest Points to Origin", "url": "https://leetcode.com/problems/k-closest-points-to-origin/"}
+    ]
+  },
+  {
+    "id": 39,
+    "title": "Part 39: Heaps - Advanced Patterns",
+    "topics": "Two Heaps Pattern, K-way Merge, Task Scheduling",
+    "learnLink": "https://chat.openai.com/?q=Explain+the+Two+Heaps+pattern+for+finding+Median+from+Data+Stream.+Explain+K-Way+Merge+using+a+heap.+How+to+solve+Task+Scheduler+using+a+heap+and+queue?",
+    "problems": [
+      {"id": "p39_1", "name": "Find Median from Data Stream", "url": "https://leetcode.com/problems/find-median-from-data-stream/"},
+      {"id": "p39_2", "name": "Task Scheduler", "url": "https://leetcode.com/problems/task-scheduler/"},
+      {"id": "p39_3", "name": "Merge k Sorted Lists", "url": "https://leetcode.com/problems/merge-k-sorted-lists/"},
+      {"id": "p39_4", "name": "Reorganize String", "url": "https://leetcode.com/problems/reorganize-string/"}
+    ]
+  },
+  {
+    "id": 40,
+    "title": "Part 40: Tries (Prefix Trees)",
+    "topics": "Trie Node Structure, Insert, Search, StartsWith",
+    "learnLink": "https://chat.openai.com/?q=Explain+the+Trie+(Prefix+Tree)+data+structure.+Why+is+it+useful+for+autocomplete?+Show+how+to+implement+a+TrieNode+class+and+the+insert/search+methods+in+Python.",
+    "problems": [
+      {"id": "p40_1", "name": "Implement Trie (Prefix Tree)", "url": "https://leetcode.com/problems/implement-trie-prefix-tree/"},
+      {"id": "p40_2", "name": "Design Add and Search Words Data Structure", "url": "https://leetcode.com/problems/design-add-and-search-words-data-structure/"},
+      {"id": "p40_3", "name": "Word Search II", "url": "https://leetcode.com/problems/word-search-ii/"},
+      {"id": "p40_4", "name": "Replace Words", "url": "https://leetcode.com/problems/replace-words/"},
+      {"id": "p40_5", "name": "Map Sum Pairs", "url": "https://leetcode.com/problems/map-sum-pairs/"}
+    ]
+  },
+  {
+    "id": 41,
+    "title": "Part 41: Backtracking - Subsets",
+    "topics": "Choice-Constraint-Goal, State Space Tree, Power Set",
+    "learnLink": "https://chat.openai.com/?q=Explain+Backtracking+algorithm+using+the+Subsets+problem.+Visualize+the+State+Space+Tree.+Explain+the+pattern:+Choose,+Explore,+Unchoose.",
+    "problems": [
+      {"id": "p41_1", "name": "Subsets", "url": "https://leetcode.com/problems/subsets/"},
+      {"id": "p41_2", "name": "Subsets II", "url": "https://leetcode.com/problems/subsets-ii/"},
+      {"id": "p41_3", "name": "Letter Case Permutation", "url": "https://leetcode.com/problems/letter-case-permutation/"},
+      {"id": "p41_4", "name": "Generate Parentheses", "url": "https://leetcode.com/problems/generate-parentheses/"}
+    ]
+  },
+  {
+    "id": 42,
+    "title": "Part 42: Backtracking - Combinations",
+    "topics": "Combinatorial Search, Pruning duplicates, Target Sum",
+    "learnLink": "https://chat.openai.com/?q=Explain+Backtracking+for+Combination+Sum.+How+do+we+handle+unlimited+reuse+of+elements+vs+single+use?+Show+how+sorting+helps+in+pruning+duplicates.",
+    "problems": [
+      {"id": "p42_1", "name": "Combination Sum", "url": "https://leetcode.com/problems/combination-sum/"},
+      {"id": "p42_2", "name": "Combination Sum II", "url": "https://leetcode.com/problems/combination-sum-ii/"},
+      {"id": "p42_3", "name": "Combinations", "url": "https://leetcode.com/problems/combinations/"},
+      {"id": "p42_4", "name": "Combination Sum III", "url": "https://leetcode.com/problems/combination-sum-iii/"}
+    ]
+  },
+  {
+    "id": 43,
+    "title": "Part 43: Backtracking - Permutations",
+    "topics": "Ordering matters, Used array/set, Swapping method",
+    "learnLink": "https://chat.openai.com/?q=Explain+Backtracking+for+Permutations.+How+is+it+different+from+Subsets?+Explain+the+logic+of+tracking+'used'+elements+or+swapping+elements+in+place.",
+    "problems": [
+      {"id": "p43_1", "name": "Permutations", "url": "https://leetcode.com/problems/permutations/"},
+      {"id": "p43_2", "name": "Permutations II", "url": "https://leetcode.com/problems/permutations-ii/"},
+      {"id": "p43_3", "name": "Letter Combinations of a Phone Number", "url": "https://leetcode.com/problems/letter-combinations-of-a-phone-number/"},
+      {"id": "p43_4", "name": "Palindrome Partitioning", "url": "https://leetcode.com/problems/palindrome-partitioning/"}
+    ]
+  },
+  {
+    "id": 44,
+    "title": "Part 44: Backtracking - Grid Problems",
+    "topics": "DFS on Grid, Word Search, Boundary checks",
+    "learnLink": "https://chat.openai.com/?q=Explain+Backtracking+on+a+2D+Grid+(e.g.,+Word+Search).+How+to+handle+visited+cells+in+the+recursion+stack+and+backtrack+correctly?+Show+direction+arrays+usage.",
+    "problems": [
+      {"id": "p44_1", "name": "Word Search", "url": "https://leetcode.com/problems/word-search/"},
+      {"id": "p44_2", "name": "Unique Paths III", "url": "https://leetcode.com/problems/unique-paths-iii/"},
+      {"id": "p44_3", "name": "N-Queens", "url": "https://leetcode.com/problems/n-queens/"},
+      {"id": "p44_4", "name": "Sudoku Solver", "url": "https://leetcode.com/problems/sudoku-solver/"}
+    ]
+  },
+  {
+    "id": 45,
+    "title": "Part 45: Graphs - Intro & BFS",
+    "topics": "Adjacency List/Matrix, Queue, Shortest Path (Unweighted)",
+    "learnLink": "https://chat.openai.com/?q=Explain+Graph+Data+Structures+(Adjacency+List+vs+Matrix).+Explain+BFS+(Breadth+First+Search)+for+finding+Shortest+Path+in+unweighted+graphs.+Provide+Python+implementation+using+deque.",
+    "problems": [
+      {"id": "p45_1", "name": "Number of Islands", "url": "https://leetcode.com/problems/number-of-islands/"},
+      {"id": "p45_2", "name": "Rotting Oranges", "url": "https://leetcode.com/problems/rotting-oranges/"},
+      {"id": "p45_3", "name": "Walls and Gates", "url": "https://leetcode.com/problems/walls-and-gates/"},
+      {"id": "p45_4", "name": "01 Matrix", "url": "https://leetcode.com/problems/01-matrix/"}
+    ]
+  },
+  {
+    "id": 46,
+    "title": "Part 46: Graphs - DFS & Connected Components",
+    "topics": "Recursive DFS, Stack DFS, Counting Components",
+    "learnLink": "https://chat.openai.com/?q=Explain+DFS+(Depth+First+Search)+on+Graphs.+How+to+count+Connected+Components?+Walk+through+'Number+of+Islands'+using+DFS.+Compare+Recursive+vs+Iterative+DFS.",
+    "problems": [
+      {"id": "p46_1", "name": "Max Area of Island", "url": "https://leetcode.com/problems/max-area-of-island/"},
+      {"id": "p46_2", "name": "Surrounded Regions", "url": "https://leetcode.com/problems/surrounded-regions/"},
+      {"id": "p46_3", "name": "Clone Graph", "url": "https://leetcode.com/problems/clone-graph/"},
+      {"id": "p46_4", "name": "Pacific Atlantic Water Flow", "url": "https://leetcode.com/problems/pacific-atlantic-water-flow/"}
+    ]
+  },
+  {
+    "id": 47,
+    "title": "Part 47: Graphs - Topological Sort",
+    "topics": "DAG, Kahn's Algorithm (In-degree), Course Schedule",
+    "learnLink": "https://chat.openai.com/?q=Explain+Topological+Sort+using+Kahn's+Algorithm+(BFS+Indegree).+What+is+a+DAG?+Walk+through+the+'Course+Schedule'+problem.+How+does+it+detect+cycles?",
+    "problems": [
+      {"id": "p47_1", "name": "Course Schedule", "url": "https://leetcode.com/problems/course-schedule/"},
+      {"id": "p47_2", "name": "Course Schedule II", "url": "https://leetcode.com/problems/course-schedule-ii/"},
+      {"id": "p47_3", "name": "Alien Dictionary", "url": "https://leetcode.com/problems/alien-dictionary/"},
+      {"id": "p47_4", "name": "Find Eventual Safe States", "url": "https://leetcode.com/problems/find-eventual-safe-states/"}
+    ]
+  },
+  {
+    "id": 48,
+    "title": "Part 48: Graphs - Union Find (DSU)",
+    "topics": "Disjoint Set Union, Path Compression, Rank/Size Optimization",
+    "learnLink": "https://chat.openai.com/?q=Explain+Union-Find+(Disjoint+Set+Union)+data+structure.+Explain+Find+with+Path+Compression+and+Union+by+Rank/Size.+Why+is+it+nearly+O(1)?+Apply+it+to+'Redundant+Connection'.",
+    "problems": [
+      {"id": "p48_1", "name": "Redundant Connection", "url": "https://leetcode.com/problems/redundant-connection/"},
+      {"id": "p48_2", "name": "Number of Connected Components in an Undirected Graph", "url": "https://leetcode.com/problems/number-of-connected-components-in-an-undirected-graph/"},
+      {"id": "p48_3", "name": "Graph Valid Tree", "url": "https://leetcode.com/problems/graph-valid-tree/"},
+      {"id": "p48_4", "name": "Accounts Merge", "url": "https://leetcode.com/problems/accounts-merge/"}
+    ]
+  },
+  {
+    "id": 49,
+    "title": "Part 49: Graphs - Minimum Spanning Tree",
+    "topics": "Prim's Algorithm, Kruskal's Algorithm, Min Cost Connect",
+    "learnLink": "https://chat.openai.com/?q=Explain+Minimum+Spanning+Tree+(MST).+Compare+Prim's+(Heap+based)+vs+Kruskal's+(Union-Find)+algorithms.+Walk+through+'Min+Cost+to+Connect+All+Points'.",
+    "problems": [
+      {"id": "p49_1", "name": "Min Cost to Connect All Points", "url": "https://leetcode.com/problems/min-cost-to-connect-all-points/"},
+      {"id": "p49_2", "name": "Connecting Cities With Minimum Cost", "url": "https://leetcode.com/problems/connecting-cities-with-minimum-cost/"},
+      {"id": "p49_3", "name": "Swim in Rising Water", "url": "https://leetcode.com/problems/swim-in-rising-water/"}
+    ]
+  },
+  {
+    "id": 50,
+    "title": "Part 50: Advanced Graphs - Shortest Path",
+    "topics": "Dijkstra's Algorithm, Weighted Graphs, Priority Queue",
+    "learnLink": "https://chat.openai.com/?q=Explain+Dijkstra's+Algorithm+for+Shortest+Path+in+Weighted+Graphs.+Why+does+BFS+fail+here?+Explain+the+Priority+Queue+implementation+step-by-step+with+example.",
+    "problems": [
+      {"id": "p50_1", "name": "Network Delay Time", "url": "https://leetcode.com/problems/network-delay-time/"},
+      {"id": "p50_2", "name": "Cheapest Flights Within K Stops", "url": "https://leetcode.com/problems/cheapest-flights-within-k-stops/"},
+      {"id": "p50_3", "name": "Path with Maximum Probability", "url": "https://leetcode.com/problems/path-with-maximum-probability/"}
+    ]
+  },
+  {
+    "id": 51,
+    "title": "Part 51: Advanced Graphs - Bellman Ford & Floyd Warshall",
+    "topics": "Negative cycles, All-Pairs Shortest Path",
+    "learnLink": "https://chat.openai.com/?q=Explain+Bellman-Ford+algorithm+and+detecting+Negative+Weight+Cycles.+Briefly+explain+Floyd-Warshall+for+All-Pairs+Shortest+Path.+When+to+use+which?",
+    "problems": [
+      {"id": "p51_1", "name": "Cheapest Flights Within K Stops", "url": "https://leetcode.com/problems/cheapest-flights-within-k-stops/"},
+      {"id": "p51_2", "name": "Network Delay Time", "url": "https://leetcode.com/problems/network-delay-time/"},
+      {"id": "p51_3", "name": "Find the City With the Smallest Number of Neighbors at a Threshold Distance", "url": "https://leetcode.com/problems/find-the-city-with-the-smallest-number-of-neighbors-at-a-threshold-distance/"}
+    ]
+  },
+  {
+    "id": 52,
+    "title": "Part 52: 1D Dynamic Programming - Basics",
+    "topics": "Fibonacci style, Climbing Stairs, Min Cost Climbing",
+    "learnLink": "https://chat.openai.com/?q=Explain+Dynamic+Programming+(DP)+basics.+Difference+between+Top-Down+(Memoization)+and+Bottom-Up+(Tabulation).+Walk+through+'Climbing+Stairs'+deriving+the+recurrence+relation.",
+    "problems": [
+      {"id": "p52_1", "name": "Climbing Stairs", "url": "https://leetcode.com/problems/climbing-stairs/"},
+      {"id": "p52_2", "name": "Min Cost Climbing Stairs", "url": "https://leetcode.com/problems/min-cost-climbing-stairs/"},
+      {"id": "p52_3", "name": "House Robber", "url": "https://leetcode.com/problems/house-robber/"},
+      {"id": "p52_4", "name": "N-th Tribonacci Number", "url": "https://leetcode.com/problems/n-th-tribonacci-number/"}
+    ]
+  },
+  {
+    "id": 53,
+    "title": "Part 53: 1D DP - House Robber Pattern",
+    "topics": "Non-adjacent elements, Circular array variant",
+    "learnLink": "https://chat.openai.com/?q=Explain+the+House+Robber+DP+pattern+(Maximum+sum+of+non-adjacent+elements).+How+does+it+change+if+houses+are+circular+(House+Robber+II)?",
+    "problems": [
+      {"id": "p53_1", "name": "House Robber II", "url": "https://leetcode.com/problems/house-robber-ii/"},
+      {"id": "p53_2", "name": "Delete and Earn", "url": "https://leetcode.com/problems/delete-and-earn/"},
+      {"id": "p53_3", "name": "Maximum Alternating Subsequence Sum", "url": "https://leetcode.com/problems/maximum-alternating-subsequence-sum/"}
+    ]
+  },
+  {
+    "id": 54,
+    "title": "Part 54: 1D DP - Palindromes",
+    "topics": "Longest Palindromic Substring, Palindromic Substrings",
+    "learnLink": "https://chat.openai.com/?q=Explain+DP+approach+for+Palindromic+Substrings.+Why+is+Expand+From+Center+usually+better+space-wise?+Explain+Longest+Palindromic+Substring.",
+    "problems": [
+      {"id": "p54_1", "name": "Longest Palindromic Substring", "url": "https://leetcode.com/problems/longest-palindromic-substring/"},
+      {"id": "p54_2", "name": "Palindromic Substrings", "url": "https://leetcode.com/problems/palindromic-substrings/"},
+      {"id": "p54_3", "name": "Longest Palindrome", "url": "https://leetcode.com/problems/longest-palindrome/"}
+    ]
+  },
+  {
+    "id": 55,
+    "title": "Part 55: 1D DP - Decode Ways & Partition",
+    "topics": "String decoding, Mapping logic, Edge cases (0s)",
+    "learnLink": "https://chat.openai.com/?q=Explain+the+'Decode+Ways'+DP+problem.+How+to+handle+zeros+and+double-digit+numbers?+Draw+the+decision+tree+and+convert+it+to+DP+array.",
+    "problems": [
+      {"id": "p55_1", "name": "Decode Ways", "url": "https://leetcode.com/problems/decode-ways/"},
+      {"id": "p55_2", "name": "Word Break", "url": "https://leetcode.com/problems/word-break/"},
+      {"id": "p55_3", "name": "Partition Equal Subset Sum", "url": "https://leetcode.com/problems/partition-equal-subset-sum/"},
+      {"id": "p55_4", "name": "Triangle", "url": "https://leetcode.com/problems/triangle/"}
+    ]
+  },
+  {
+    "id": 56,
+    "title": "Part 56: 2D DP - Grid Paths",
+    "topics": "Unique Paths, Min Path Sum, Obstacles",
+    "learnLink": "https://chat.openai.com/?q=Explain+2D+Dynamic+Programming+on+Grids.+Walk+through+'Unique+Paths'+and+'Minimum+Path+Sum'.+Explain+how+to+optimize+space+from+O(m*n)+to+O(n).",
+    "problems": [
+      {"id": "p56_1", "name": "Unique Paths", "url": "https://leetcode.com/problems/unique-paths/"},
+      {"id": "p56_2", "name": "Unique Paths II", "url": "https://leetcode.com/problems/unique-paths-ii/"},
+      {"id": "p56_3", "name": "Minimum Path Sum", "url": "https://leetcode.com/problems/minimum-path-sum/"},
+      {"id": "p56_4", "name": "Dungeon Game", "url": "https://leetcode.com/problems/dungeon-game/"}
+    ]
+  },
+  {
+    "id": 57,
+    "title": "Part 57: 2D DP - Longest Common Subsequence",
+    "topics": "LCS Pattern, String comparison, Multidimensional DP",
+    "learnLink": "https://chat.openai.com/?q=Explain+Longest+Common+Subsequence+(LCS)+problem.+Visualize+the+2D+DP+table+construction.+What+does+dp[i][j]+represent?+How+to+trace+back+the+solution?",
+    "problems": [
+      {"id": "p57_1", "name": "Longest Common Subsequence", "url": "https://leetcode.com/problems/longest-common-subsequence/"},
+      {"id": "p57_2", "name": "Uncrossed Lines", "url": "https://leetcode.com/problems/uncrossed-lines/"},
+      {"id": "p57_3", "name": "Edit Distance", "url": "https://leetcode.com/problems/edit-distance/"},
+      {"id": "p57_4", "name": "Interleaving String", "url": "https://leetcode.com/problems/interleaving-string/"}
+    ]
+  },
+  {
+    "id": 58,
+    "title": "Part 58: DP - Knapsack Problems",
+    "topics": "0/1 Knapsack, Unbounded Knapsack, Coin Change",
+    "learnLink": "https://chat.openai.com/?q=Explain+the+Knapsack+Problem+(0/1+vs+Unbounded).+Walk+through+'Coin+Change'+(Unbounded)+and+'Partition+Equal+Subset+Sum'+(0/1).+Explain+the+DP+state+transition.",
+    "problems": [
+      {"id": "p58_1", "name": "Coin Change", "url": "https://leetcode.com/problems/coin-change/"},
+      {"id": "p58_2", "name": "Coin Change II", "url": "https://leetcode.com/problems/coin-change-ii/"},
+      {"id": "p58_3", "name": "Target Sum", "url": "https://leetcode.com/problems/target-sum/"},
+      {"id": "p58_4", "name": "Perfect Squares", "url": "https://leetcode.com/problems/perfect-squares/"}
+    ]
+  },
+  {
+    "id": 59,
+    "title": "Part 59: DP - Longest Increasing Subsequence",
+    "topics": "LIS O(n^2), Patience Sorting O(n log n)",
+    "learnLink": "https://chat.openai.com/?q=Explain+Longest+Increasing+Subsequence+(LIS).+Show+the+DP+O(n^2)+approach.+Then+explain+the+Binary+Search+approach+O(n+log+n)+using+patience+sorting+concept.",
+    "problems": [
+      {"id": "p59_1", "name": "Longest Increasing Subsequence", "url": "https://leetcode.com/problems/longest-increasing-subsequence/"},
+      {"id": "p59_2", "name": "Russian Doll Envelopes", "url": "https://leetcode.com/problems/russian-doll-envelopes/"},
+      {"id": "p59_3", "name": "Number of Longest Increasing Subsequence", "url": "https://leetcode.com/problems/number-of-longest-increasing-subsequence/"},
+      {"id": "p59_4", "name": "Maximum Product Subarray", "url": "https://leetcode.com/problems/maximum-product-subarray/"}
+    ]
+  },
+  {
+    "id": 60,
+    "title": "Part 60: Intervals",
+    "topics": "Merge Intervals, Insert Interval, Overlap detection",
+    "learnLink": "https://chat.openai.com/?q=Explain+Interval+problems.+How+to+sort+and+merge+intervals?+Walk+through+'Merge+Intervals'+and+'Non-overlapping+Intervals'.+What+is+the+sorting+criteria?",
+    "problems": [
+      {"id": "p60_1", "name": "Merge Intervals", "url": "https://leetcode.com/problems/merge-intervals/"},
+      {"id": "p60_2", "name": "Insert Interval", "url": "https://leetcode.com/problems/insert-interval/"},
+      {"id": "p60_3", "name": "Non-overlapping Intervals", "url": "https://leetcode.com/problems/non-overlapping-intervals/"},
+      {"id": "p60_4", "name": "Meeting Rooms II", "url": "https://leetcode.com/problems/meeting-rooms-ii/"}
+    ]
+  },
+  {
+    "id": 61,
+    "title": "Part 61: Greedy Algorithms - Basics",
+    "topics": "Local Optimum, Jump Game, Gas Station",
+    "learnLink": "https://chat.openai.com/?q=Explain+Greedy+Algorithms.+When+does+Greedy+work?+Walk+through+'Jump+Game'+and+'Gas+Station'.+Why+is+Jump+Game+Greedy+and+not+DP?",
+    "problems": [
+      {"id": "p61_1", "name": "Jump Game", "url": "https://leetcode.com/problems/jump-game/"},
+      {"id": "p61_2", "name": "Jump Game II", "url": "https://leetcode.com/problems/jump-game-ii/"},
+      {"id": "p61_3", "name": "Gas Station", "url": "https://leetcode.com/problems/gas-station/"},
+      {"id": "p61_4", "name": "Hand of Straights", "url": "https://leetcode.com/problems/hand-of-straights/"}
+    ]
+  },
+  {
+    "id": 62,
+    "title": "Part 62: Bit Manipulation - Basics",
+    "topics": "XOR, Shifts, Masking, Counting Bits",
+    "learnLink": "https://chat.openai.com/?q=Explain+Bit+Manipulation+for+interviews.+Deep+dive+into+XOR+properties+(a^a=0).+How+to+count+set+bits+(Brian+Kernighan’s+algorithm)?+Explain+Left/Right+Shifts.",
+    "problems": [
+      {"id": "p62_1", "name": "Single Number", "url": "https://leetcode.com/problems/single-number/"},
+      {"id": "p62_2", "name": "Number of 1 Bits", "url": "https://leetcode.com/problems/number-of-1-bits/"},
+      {"id": "p62_3", "name": "Counting Bits", "url": "https://leetcode.com/problems/counting-bits/"},
+      {"id": "p62_4", "name": "Reverse Bits", "url": "https://leetcode.com/problems/reverse-bits/"}
+    ]
+  },
+  {
+    "id": 63,
+    "title": "Part 63: Bit Manipulation - Advanced",
+    "topics": "Reverse Bits, Sum without +, Bitwise States",
+    "learnLink": "https://chat.openai.com/?q=Advanced+Bit+Manipulation.+How+to+Add+Two+Integers+without+using+'+'?+How+to+Reverse+Bits+of+an+integer?+Explain+using+bitmasks+for+DP+state.",
+    "problems": [
+      {"id": "p63_1", "name": "Sum of Two Integers", "url": "https://leetcode.com/problems/sum-of-two-integers/"},
+      {"id": "p63_2", "name": "Missing Number", "url": "https://leetcode.com/problems/missing-number/"},
+      {"id": "p63_3", "name": "Single Number III", "url": "https://leetcode.com/problems/single-number-iii/"},
+      {"id": "p63_4", "name": "Maximum Product of Word Lengths", "url": "https://leetcode.com/problems/maximum-product-of-word-lengths/"}
+    ]
+  },
+  {
+    "id": 64,
+    "title": "Part 64: Math & Geometry - Basics",
+    "topics": "GCD, LCM, Primes (Sieve), Pow(x,n)",
+    "learnLink": "https://chat.openai.com/?q=Math+Algorithms+for+interviews.+Explain+Euclidean+algorithm+for+GCD.+Explain+Sieve+of+Eratosthenes+for+primes.+How+to+implement+Pow(x,+n)+in+O(log+n)?",
+    "problems": [
+      {"id": "p64_1", "name": "Pow(x, n)", "url": "https://leetcode.com/problems/powx-n/"},
+      {"id": "p64_2", "name": "Plus One", "url": "https://leetcode.com/problems/plus-one/"},
+      {"id": "p64_3", "name": "Count Primes", "url": "https://leetcode.com/problems/count-primes/"},
+      {"id": "p64_4", "name": "Ugly Number", "url": "https://leetcode.com/problems/ugly-number/"},
+      {"id": "p64_5", "name": "Happy Number", "url": "https://leetcode.com/problems/happy-number/"}
+    ]
+  },
+  {
+    "id": 65,
+    "title": "Part 65: Math - Matrix & Geometry",
+    "topics": "Rotate Image, Spiral Matrix, Set Matrix Zeroes",
+    "learnLink": "https://chat.openai.com/?q=Explain+Matrix+Manipulation+tricks.+How+to+Rotate+Image+90+degrees+in-place?+How+to+traverse+Spiral+Matrix?+Explain+logic+for+Set+Matrix+Zeroes+O(1)+space.",
+    "problems": [
+      {"id": "p65_1", "name": "Rotate Image", "url": "https://leetcode.com/problems/rotate-image/"},
+      {"id": "p65_2", "name": "Spiral Matrix", "url": "https://leetcode.com/problems/spiral-matrix/"},
+      {"id": "p65_3", "name": "Set Matrix Zeroes", "url": "https://leetcode.com/problems/set-matrix-zeroes/"},
+      {"id": "p65_4", "name": "Game of Life", "url": "https://leetcode.com/problems/game-of-life/"},
+      {"id": "p65_5", "name": "Valid Square", "url": "https://leetcode.com/problems/valid-square/"}
+    ]
+  },
+  {
+    "id": 66,
+    "title": "Part 66: System Design - Scalability Basics & Object Design",
+    "topics": "Vertical vs Horizontal Scaling, Load Balancing, Object Design Patterns",
+    "learnLink": "https://chat.openai.com/?q=Intro+to+System+Design.+Explain+Vertical+vs+Horizontal+Scaling.+What+is+a+Load+Balancer+(L4+vs+L7)?+Explain+Latency+vs+Throughput.+Walk+through+designing+an+Underground+System+class.",
+    "problems": [
+      {"id": "p66_1", "name": "Design TinyURL", "url": "https://leetcode.com/problems/encode-and-decode-tinyurl/"},
+      {"id": "p66_2", "name": "Design Underground System", "url": "https://leetcode.com/problems/design-underground-system/"},
+      {"id": "p66_3", "name": "Design Browser History", "url": "https://leetcode.com/problems/design-browser-history/"},
+      {"id": "p66_4", "name": "Design Parking System", "url": "https://leetcode.com/problems/design-parking-system/"}
+    ]
+  },
+  {
+    "id": 67,
+    "title": "Part 67: System Design - Databases & Feeds",
+    "topics": "SQL vs NoSQL, ACID vs BASE, Sharding, Replication, Feed Generation",
+    "learnLink": "https://chat.openai.com/?q=System+Design+Databases.+Compare+SQL+(Relational)+vs+NoSQL.+Explain+Database+Sharding+and+Master-Slave+Replication.+How+to+design+a+News+Feed+System?(Push+vs+Pull+model).",
+    "problems": [
+      {"id": "p67_1", "name": "Design Twitter", "url": "https://leetcode.com/problems/design-twitter/"},
+      {"id": "p67_2", "name": "Design a Food Rating System", "url": "https://leetcode.com/problems/design-a-food-rating-system/"},
+      {"id": "p67_3", "name": "Snapshot Array", "url": "https://leetcode.com/problems/snapshot-array/"},
+      {"id": "p67_4", "name": "Design Movie Rental System (Premium/Concept)", "url": "https://leetcode.com/problems/design-movie-rental-system/"}
+    ]
+  },
+  {
+    "id": 68,
+    "title": "Part 68: System Design - Caching & Eviction",
+    "topics": "Cache Strategies (Read-Through, Write-Back), Redis, CDN, Eviction Policies",
+    "learnLink": "https://chat.openai.com/?q=System+Design+Caching.+Why+use+Redis/Memcached?+Explain+Caching+strategies:+Cache-Aside,+Read-Through,+Write-Back.+Explain+LRU+vs+LFU+eviction+policies.",
+    "problems": [
+      {"id": "p68_1", "name": "LRU Cache", "url": "https://leetcode.com/problems/lru-cache/"},
+      {"id": "p68_2", "name": "LFU Cache", "url": "https://leetcode.com/problems/lfu-cache/"},
+      {"id": "p68_3", "name": "Design Circular Deque", "url": "https://leetcode.com/problems/design-circular-deque/"},
+      {"id": "p68_4", "name": "Design Circular Queue", "url": "https://leetcode.com/problems/design-circular-queue/"}
+    ]
+  },
+  {
+    "id": 69,
+    "title": "Part 69: System Design - Hashing & Rate Limiting",
+    "topics": "Consistent Hashing, Token Bucket, Leaky Bucket, Streams",
+    "learnLink": "https://chat.openai.com/?q=Explain+Consistent+Hashing+and+why+it+is+crucial+for+distributed+systems.+Explain+Rate+Limiting+algorithms:+Token+Bucket+vs+Leaky+Bucket.+How+to+handle+Data+Streams?",
+    "problems": [
+      {"id": "p69_1", "name": "Design Hit Counter", "url": "https://leetcode.com/problems/design-hit-counter/"},
+      {"id": "p69_2", "name": "Logger Rate Limiter", "url": "https://leetcode.com/problems/logger-rate-limiter/"},
+      {"id": "p69_3", "name": "Design Ordered Stream", "url": "https://leetcode.com/problems/design-an-ordered-stream/"},
+      {"id": "p69_4", "name": "Moving Average from Data Stream", "url": "https://leetcode.com/problems/moving-average-from-data-stream/"},
+      {"id": "p69_5", "name": "Design Authentication Manager", "url": "https://leetcode.com/problems/design-authentication-manager/"}
+    ]
+  },
+  {
+    "id": 70,
+    "title": "Part 70: SQL - Basic Queries",
+    "topics": "Select, Where, Order By, Limit",
+    "learnLink": "https://chat.openai.com/?q=Teach+Basic+SQL+for+interviews.+Explain+SELECT,+WHERE,+ORDER+BY,+LIMIT.+Difference+between+WHERE+and+HAVING.+How+to+handle+NULL+values?",
+    "problems": [
+      {"id": "p70_1", "name": "Recyclable and Low Fat Products", "url": "https://leetcode.com/problems/recyclable-and-low-fat-products/"},
+      {"id": "p70_2", "name": "Big Countries", "url": "https://leetcode.com/problems/big-countries/"},
+      {"id": "p70_3", "name": "Invalid Tweets", "url": "https://leetcode.com/problems/invalid-tweets/"},
+      {"id": "p70_4", "name": "Article Views I", "url": "https://leetcode.com/problems/article-views-i/"},
+      {"id": "p70_5", "name": "Find Customer Referee", "url": "https://leetcode.com/problems/find-customer-referee/"}
+    ]
+  },
+  {
+    "id": 71,
+    "title": "Part 71: SQL - Joins",
+    "topics": "Inner, Left, Right, Full Outer Joins",
+    "learnLink": "https://chat.openai.com/?q=Explain+SQL+Joins+visually.+Difference+between+INNER+JOIN,+LEFT+JOIN,+RIGHT+JOIN,+and+FULL+OUTER+JOIN.+Give+examples.",
+    "problems": [
+      {"id": "p71_1", "name": "Combine Two Tables", "url": "https://leetcode.com/problems/combine-two-tables/"},
+      {"id": "p71_2", "name": "Customer Who Visited but Did Not Make Any Transactions", "url": "https://leetcode.com/problems/customer-who-visited-but-did-not-make-any-transactions/"},
+      {"id": "p71_3", "name": "Employee Bonus", "url": "https://leetcode.com/problems/employee-bonus/"},
+      {"id": "p71_4", "name": "Managers with at Least 5 Direct Reports", "url": "https://leetcode.com/problems/managers-with-at-least-5-direct-reports/"},
+      {"id": "p71_5", "name": "Product Sales Analysis I", "url": "https://leetcode.com/problems/product-sales-analysis-i/"}
+    ]
+  },
+  {
+    "id": 72,
+    "title": "Part 72: SQL - Aggregation & Grouping",
+    "topics": "Count, Sum, Avg, Group By, Having",
+    "learnLink": "https://chat.openai.com/?q=SQL+Aggregation+Functions.+Explain+COUNT,+SUM,+AVG.+How+to+use+GROUP+BY+and+HAVING+clauses?+Order+of+execution+in+SQL+query.",
+    "problems": [
+      {"id": "p72_1", "name": "Classes More Than 5 Students", "url": "https://leetcode.com/problems/classes-more-than-5-students/"},
+      {"id": "p72_2", "name": "Find Total Time Spent by Each Employee", "url": "https://leetcode.com/problems/find-total-time-spent-by-each-employee/"},
+      {"id": "p72_3", "name": "Game Play Analysis I", "url": "https://leetcode.com/problems/game-play-analysis-i/"},
+      {"id": "p72_4", "name": "Number of Unique Subjects Taught by Each Teacher", "url": "https://leetcode.com/problems/number-of-unique-subjects-taught-by-each-teacher/"},
+      {"id": "p72_5", "name": "Sales Person", "url": "https://leetcode.com/problems/sales-person/"}
+    ]
+  },
+  {
+    "id": 73,
+    "title": "Part 73: Company Specific - Meta (Facebook)",
+    "topics": "Top Meta Questions, Arrays, Strings, Heaps",
+    "learnLink": "https://chat.openai.com/?q=What+are+the+top+coding+interview+patterns+for+Meta+(Facebook)?+List+top+5+frequent+questions+and+explain+the+focus+on+Array/String+and+Heap+problems.",
+    "problems": [
+      {"id": "p73_1", "name": "Minimum Remove to Make Valid Parentheses", "url": "https://leetcode.com/problems/minimum-remove-to-make-valid-parentheses/"},
+      {"id": "p73_2", "name": "Valid Palindrome II", "url": "https://leetcode.com/problems/valid-palindrome-ii/"},
+      {"id": "p73_3", "name": "K Closest Points to Origin", "url": "https://leetcode.com/problems/k-closest-points-to-origin/"},
+      {"id": "p73_4", "name": "Buildings With an Ocean View", "url": "https://leetcode.com/problems/buildings-with-an-ocean-view/"},
+      {"id": "p73_5", "name": "Dot Product of Two Sparse Vectors", "url": "https://leetcode.com/problems/dot-product-of-two-sparse-vectors/"},
+      {"id": "p73_6", "name": "Range Sum of BST", "url": "https://leetcode.com/problems/range-sum-of-bst/"}
+    ]
+  },
+  {
+    "id": 74,
+    "title": "Part 74: Company Specific - Google",
+    "topics": "Top Google Questions, DP, Graphs, Tries",
+    "learnLink": "https://chat.openai.com/?q=What+are+the+top+coding+interview+patterns+for+Google?+Why+do+they+focus+on+DP,+Graphs,+and+hard+Trie+problems?+List+top+examples.",
+    "problems": [
+      {"id": "p74_1", "name": "Logger Rate Limiter", "url": "https://leetcode.com/problems/logger-rate-limiter/"},
+      {"id": "p74_2", "name": "Evaluate Division", "url": "https://leetcode.com/problems/evaluate-division/"},
+      {"id": "p74_3", "name": "Text Justification", "url": "https://leetcode.com/problems/text-justification/"},
+      {"id": "p74_4", "name": "Detect Squares", "url": "https://leetcode.com/problems/detect-squares/"},
+      {"id": "p74_5", "name": "Race Car", "url": "https://leetcode.com/problems/race-car/"},
+      {"id": "p74_6", "name": "Step-By-Step Directions From a Binary Tree Node to Another", "url": "https://leetcode.com/problems/step-by-step-directions-from-a-binary-tree-node-to-another/"}
+    ]
+  },
+  {
+    "id": 75,
+    "title": "Part 75: Company Specific - Amazon",
+    "topics": "Top Amazon Questions, BFS/DFS, OA patterns",
+    "learnLink": "https://chat.openai.com/?q=What+are+the+top+coding+interview+patterns+for+Amazon?+Focus+on+Leadership+Principles+and+BFS/DFS+Grid+problems.+List+top+questions.",
+    "problems": [
+      {"id": "p75_1", "name": "Number of Islands", "url": "https://leetcode.com/problems/number-of-islands/"},
+      {"id": "p75_2", "name": "Reorganize String", "url": "https://leetcode.com/problems/reorganize-string/"},
+      {"id": "p75_3", "name": "Search Suggestions System", "url": "https://leetcode.com/problems/search-suggestions-system/"},
+      {"id": "p75_4", "name": "Analyze User Website Visit Pattern", "url": "https://leetcode.com/problems/analyze-user-website-visit-pattern/"},
+      {"id": "p75_5", "name": "Maximum Units on a Truck", "url": "https://leetcode.com/problems/maximum-units-on-a-truck/"},
+      {"id": "p75_6", "name": "Robot Bounded In Circle", "url": "https://leetcode.com/problems/robot-bounded-in-circle/"}
+    ]
+  },
+  {
+    "id": 76,
+    "title": "Part 76: Python Advanced - Decorators",
+    "topics": "Closures, Decorator Syntax, Wraps, Args/Kwargs",
+    "learnLink": "https://chat.openai.com/?q=Explain+Python+Decorators+for+interviews.+How+do+they+work+under+the+hood+(Closures)?+Write+a+decorator+to+measure+function+execution+time.+Explain+@functools.wraps.",
+    "problems": [
+      {"id": "p76_1", "name": "Design (Memoization Decorator Practice)", "url": "https://leetcode.com/problems/fibonacci-number/"}
+    ]
+  },
+  {
+    "id": 77,
+    "title": "Part 77: Python Advanced - Generators & Iterators",
+    "topics": "Yield keyword, __iter__, __next__, Memory Efficiency",
+    "learnLink": "https://chat.openai.com/?q=Explain+Python+Generators+and+the+'yield'+keyword.+Difference+between+Iterables,+Iterators,+and+Generators.+Why+use+generators+for+large+datasets?",
+    "problems": [
+      {"id": "p77_1", "name": "Peeking Iterator", "url": "https://leetcode.com/problems/peeking-iterator/"},
+      {"id": "p77_2", "name": "Binary Search Tree Iterator", "url": "https://leetcode.com/problems/binary-search-tree-iterator/"},
+      {"id": "p77_3", "name": "Flatten Nested List Iterator", "url": "https://leetcode.com/problems/flatten-nested-list-iterator/"}
+    ]
+  },
+  {
+    "id": 78,
+    "title": "Part 78: Python Advanced - Context Managers",
+    "topics": "With statement, __enter__, __exit__, File handling",
+    "learnLink": "https://chat.openai.com/?q=Explain+Python+Context+Managers+(the+'with'+statement).+How+to+implement+a+custom+context+manager+class+using+__enter__+and+__exit__?+Explain+application+in+File+I/O+and+Locks.",
+    "problems": [
+      {"id": "p78_1", "name": "Concept Practice (No specific LC)", "url": "https://leetcode.com/"}
+    ]
+  },
+  {
+    "id": 79,
+    "title": "Part 79: Python Advanced - Multithreading vs Multiprocessing",
+    "topics": "GIL, Threading module, Multiprocessing module, CPU vs I/O bound",
+    "learnLink": "https://chat.openai.com/?q=Explain+Python+Global+Interpreter+Lock+(GIL).+Difference+between+Multithreading+and+Multiprocessing.+When+to+use+which?(I/O+bound+vs+CPU+bound).",
+    "problems": [
+      {"id": "p79_1", "name": "Web Crawler Multithreaded", "url": "https://leetcode.com/problems/web-crawler-multithreaded/"},
+      {"id": "p79_2", "name": "Traffic Light Controlled Intersection", "url": "https://leetcode.com/problems/traffic-light-controlled-intersection/"},
+      {"id": "p79_3", "name": "Print in Order", "url": "https://leetcode.com/problems/print-in-order/"}
+    ]
+  },
+  {
+    "id": 80,
+    "title": "Part 80: Mock Interview - Data Structures Mix",
+    "topics": "Mixed Bag of Arrays, Strings, Lists, Trees",
+    "learnLink": "https://chat.openai.com/?q=Act+as+a+Mock+Interviewer.+Give+me+a+random+Medium+LeetCode+problem+involving+either+Trees+or+Arrays,+ask+me+to+explain+my+approach,+and+critique+my+Time+Complexity.",
+    "problems": [
+      {"id": "p80_1", "name": "Random Pick with Weight", "url": "https://leetcode.com/problems/random-pick-with-weight/"},
+      {"id": "p80_2", "name": "Insert Delete GetRandom O(1)", "url": "https://leetcode.com/problems/insert-delete-getrandom-o1/"},
+      {"id": "p80_3", "name": "Shuffle an Array", "url": "https://leetcode.com/problems/shuffle-an-array/"}
+    ]
+  },
+  {
+    "id": 81,
+    "title": "Part 81: Mock Interview - Algorithm Mix",
+    "topics": "DP, Greedy, Backtracking Mix",
+    "learnLink": "https://chat.openai.com/?q=Act+as+a+Mock+Interviewer.+Give+me+a+random+Hard+LeetCode+problem+involving+DP+or+Graphs.+Ask+clarifying+questions+before+I+code.",
+    "problems": [
+      {"id": "p81_1", "name": "Trapping Rain Water", "url": "https://leetcode.com/problems/trapping-rain-water/"},
+      {"id": "p81_2", "name": "Word Ladder", "url": "https://leetcode.com/problems/word-ladder/"},
+      {"id": "p81_3", "name": "Regular Expression Matching", "url": "https://leetcode.com/problems/regular-expression-matching/"}
+    ]
+  },
+  {
+    "id": 82,
+    "title": "Part 82: Contest Prep - Fast I/O & Template",
+    "topics": "Standard Library mastery, Input parsing speed",
+    "learnLink": "https://chat.openai.com/?q=How+to+speed+up+Python+I/O+for+Competitive+Programming?+Share+a+standard+template+using+sys.stdin.readline.+Explain+techniques+to+avoid+TLE+in+Python.",
+    "problems": [
+      {"id": "p82_1", "name": "Codeforces/LeetCode Contest (Simulate)", "url": "https://leetcode.com/contest/"}
+    ]
+  },
+  {
+    "id": 83,
+    "title": "Part 83: Advanced Strings (KMP/Rolling Hash)",
+    "topics": "KMP Algorithm, Rabin-Karp, Z-Algorithm",
+    "learnLink": "https://chat.openai.com/?q=Explain+Advanced+String+Algorithms:+KMP+(Knuth-Morris-Pratt)+and+Rabin-Karp+Rolling+Hash.+Why+are+they+O(N)?+Explain+the+LPS+array+calculation+in+KMP.+When+to+use+Rolling+Hash?",
+    "problems": [
+      {"id": "p83_1", "name": "Find the Index of the First Occurrence in a String", "url": "https://leetcode.com/problems/find-the-index-of-the-first-occurrence-in-a-string/"},
+      {"id": "p83_2", "name": "Shortest Palindrome", "url": "https://leetcode.com/problems/shortest-palindrome/"},
+      {"id": "p83_3", "name": "Longest Happy Prefix", "url": "https://leetcode.com/problems/longest-happy-prefix/"},
+      {"id": "p83_4", "name": "Repeated String Match", "url": "https://leetcode.com/problems/repeated-string-match/"},
+      {"id": "p83_5", "name": "Distinct Echo Substrings", "url": "https://leetcode.com/problems/distinct-echo-substrings/"}
+    ]
+  },
+  {
+    "id": 84,
+    "title": "Part 84: Hard Problems - DP",
+    "topics": "DP with Bitmask, DP on Trees",
+    "learnLink": "https://chat.openai.com/?q=Explain+DP+with+Bitmasking.+Walk+through+problems+like+'Can+I+Win'+or+'Partition+to+K+Equal+Sum+Subsets'.+Explain+DP+on+Trees+concept.",
+    "problems": [
+      {"id": "p84_1", "name": "Burst Balloons", "url": "https://leetcode.com/problems/burst-balloons/"},
+      {"id": "p84_2", "name": "Binary Tree Maximum Path Sum", "url": "https://leetcode.com/problems/binary-tree-maximum-path-sum/"},
+      {"id": "p84_3", "name": "Partition to K Equal Sum Subsets", "url": "https://leetcode.com/problems/partition-to-k-equal-sum-subsets/"},
+      {"id": "p84_4", "name": "Smallest Sufficient Team", "url": "https://leetcode.com/problems/smallest-sufficient-team/"}
+    ]
+  },
+  {
+    "id": 85,
+    "title": "Part 85: Hard Problems - Graphs",
+    "topics": "Eulerian Path, Tarjan's Algo (SCC), Bridges",
+    "learnLink": "https://chat.openai.com/?q=Explain+Advanced+Graph+Algorithms:+Tarjan's+Algorithm+for+SCC,+Finding+Bridges+and+Articulation+Points.+Explain+Eulerian+Path.",
+    "problems": [
+      {"id": "p85_1", "name": "Critical Connections in a Network", "url": "https://leetcode.com/problems/critical-connections-in-a-network/"},
+      {"id": "p85_2", "name": "Reconstruct Itinerary", "url": "https://leetcode.com/problems/reconstruct-itinerary/"},
+      {"id": "p85_3", "name": "Making A Large Island", "url": "https://leetcode.com/problems/making-a-large-island/"},
+      {"id": "p85_4", "name": "Bus Routes", "url": "https://leetcode.com/problems/bus-routes/"}
+    ]
+  },
+  {
+    "id": 86,
+    "title": "Part 86: Behavioral Interview Prep",
+    "topics": "STAR Method, Leadership Principles, Soft Skills",
+    "learnLink": "https://chat.openai.com/?q=Prepare+me+for+Behavioral+Interviews.+Explain+the+STAR+method+(Situation,+Task,+Action,+Result).+Give+me+5+common+questions+like+'Tell+me+about+a+time+you+failed'+and+how+to+answer+them.",
+    "problems": [
+      {"id": "p86_1", "name": "Amazon Leadership Principles Guide", "url": "https://www.amazon.jobs/en/principles"},
+      {"id": "p86_2", "name": "Googleyness Guide", "url": "https://www.google.com/about/careers/applications/interview/"},
+      {"id": "p86_3", "name": "Behavioral Mock Practice", "url": "https://www.pramp.com/"}
+    ]
+  },
+  {
+    "id": 87,
+    "title": "Part 87: Resume & Portfolio Review",
+    "topics": "Resume Parsing, Keywords, Project Showcasing",
+    "learnLink": "https://chat.openai.com/?q=Act+as+a+Tech+Recruiter.+Critique+a+software+engineer+resume.+What+keywords+are+ATS+scanners+looking+for?+How+to+describe+impact+metrics+in+bullet+points?",
+    "problems": [
+      {"id": "p87_1", "name": "Resume Word Cloud Analysis", "url": "https://www.resumeworded.com/"},
+      {"id": "p87_2", "name": "Update LinkedIn Profile", "url": "https://www.linkedin.com/"}
+    ]
+  },
+  {
+    "id": 88,
+    "title": "Part 88: Final Review - Weak Spots",
+    "topics": "Reviewing Notes, Re-solving missed problems",
+    "learnLink": "https://chat.openai.com/?q=Create+a+3-day+review+plan+before+a+coding+interview.+How+to+efficiently+review+patterns+without+burning+out?+Focus+on+Spaced+Repetition.",
+    "problems": [
+      {"id": "p88_1", "name": "Review Error Log / Failed Submissions", "url": "https://leetcode.com/"},
+      {"id": "p88_2", "name": "Re-solve Top 100 Liked Questions", "url": "https://leetcode.com/problemset/all/?listId=79h8zc5d"}
+    ]
+  },
+  {
+    "id": 89,
+    "title": "Part 89: System Design Mock",
+    "topics": "Full System Design Interview Simulation",
+    "learnLink": "https://chat.openai.com/?q=Simulate+a+System+Design+Interview.+Ask+me+to+design+Instagram.+Step+1:+Requirements.+Step+2:+API.+Step+3:+DB+Schema.+Step+4:+Scaling.",
+    "problems": [
+      {"id": "p89_1", "name": "Design Instagram", "url": "https://leetcode.com/discuss/interview-question/system-design/"},
+      {"id": "p89_2", "name": "Design Facebook Messenger", "url": "https://leetcode.com/discuss/interview-question/system-design/"}
+    ]
+  },
+  {
+    "id": 90,
+    "title": "Part 90: Final Coding Mock & Confidence",
+    "topics": "Full Coding Interview Simulation, Stress Management",
+    "learnLink": "https://chat.openai.com/?q=Simulate+a+FAANG+Coding+Interview.+Give+me+one+Easy+and+one+Medium+problem.+Time+limit+45+minutes.+Check+my+edge+cases+and+communication.",
+    "problems": [
+      {"id": "p90_1", "name": "Mock Interview Session", "url": "https://interviewing.io/"}
+    ]
+  },
+  {
+    "id": 91,
+    "title": "Bonus Part 91: Pattern Recognition Strategy",
+    "topics": "Meta-Skills, Identifying Patterns from Constraints",
+    "learnLink": "https://chat.openai.com/?q=Act+as+a+Coding+Coach.+Teach+me+how+to+identify+patterns+based+on+Input+Constraints+(e.g.,+N=20+means+O(2^N)+Recursion,+N=10^5+means+O(N+log+N)+Sorting).",
+    "problems": [
+      {"id": "p91_1", "name": "Constraint Analysis Guide", "url": "https://leetcode.com/discuss/general-discussion/834025/common-time-complexities-and-constraints-analysis"},
+      {"id": "p91_2", "name": "Pattern Identification Cheat Sheet", "url": "https://leetcode.com/discuss/study-guide/4039411/14-Patterns-to-Ace-Any-Coding-Interview-Question"}
+    ]
+  },
+  {
+    "id": 92,
+    "title": "Bonus Part 92: Mental Models for Debugging",
+    "topics": "Rubber Duck Debugging, Print vs Interactive Debugger, Common Python Pitfalls",
+    "learnLink": "https://chat.openai.com/?q=Teach+me+Mental+Models+for+debugging+coding+interview+problems.+How+to+dry-run+code+manually+on+paper?+What+are+common+Python+pitfalls+(e.g.,+modifying+list+while+iterating,+mutable+defaults)?",
+    "problems": [
+      {"id": "p92_1", "name": "Debugging Practice: Error Handling", "url": "https://leetcode.com/problems/string-to-integer-atoi/"}
+    ]
+  }
+        ];
+    </script>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
         import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
-        // --- PASTE YOUR FIREBASE KEYS BELOW ---
+        // --- PASTE YOUR FIREBASE KEYS HERE ---
         const firebaseConfig = {
             apiKey: "AIzaSyDSeqlg_QIEzHx2n15GcOP5jgKZzQ_MzZg",
             authDomain: "sdet-dashboard.firebaseapp.com",
@@ -285,15 +1354,12 @@
                 if(data) {
                     window.state = data;
                     if (!window.state.projects) window.state.projects = [];
-                    if (!window.state.dsa) window.state.dsa = [];
+                    // dsaStatus now tracks { "problemId": true/false }
                     if (!window.state.dsaStatus) window.state.dsaStatus = {};
                     if (!window.state.routine) window.state.routine = [];
                     if (!window.state.healthHistory) window.state.healthHistory = {};
                     if (!window.state.todayHealth) window.state.todayHealth = [];
                     
-                    if(window.state.dsa.length > 0 && !window.state.dsa[0].id) { 
-                        window.state.dsa = window.state.dsa.map((x,i) => ({...x, id: Date.now()+i})); 
-                    }
                     window.render();
                     updateSyncStatus(true);
                 } else {
@@ -328,21 +1394,10 @@
     </script>
 
     <script>
-        // --- DEFAULT DATA ---
-        const dsa90Days = [
-            { day: 1, topic: "Arrays", task: "Build Array Permutation", link: "https://leetcode.com/problems/build-array-from-permutation/", pri: "Low" },
-            { day: 2, topic: "Arrays", task: "Contains Duplicate", link: "https://leetcode.com/problems/contains-duplicate/", pri: "Low" }
-        ];
-        for(let i=3; i<=90; i++) {
-            let topic = i<30?"Strings":i<50?"Stacks":i<70?"Trees":"DP";
-            dsa90Days.push({day: i, topic: topic, task: `Problem Day ${i}`, link: "#", pri: "Medium"});
-        }
-        const dsaWithIds = dsa90Days.map((x, i) => ({ ...x, id: Date.now() + i }));
-
+        // STATE
         window.state = {
             projects: [],
-            dsa: dsaWithIds,
-            dsaStatus: {}, 
+            dsaStatus: {}, // Stores which problem IDs are done
             routine: [ {id: 1, time: "08:00", text: "Wake up"}, {id: 2, time: "08:30", text: "DSA"}, {id: 3, time: "10:00", text: "Work"} ],
             healthHistory: {},
             todayHealth: []
@@ -352,7 +1407,8 @@
         window.render = function() {
             renderKPIs();
             renderProjects('Work'); renderProjects('Epam'); renderProjects('Learning');
-            renderDSA(); renderHealth();
+            renderDSAMastery(); // New Function
+            renderHealth();
             updateCharts();
             document.getElementById('current-date').innerText = new Date().toLocaleDateString('en-IN', {weekday:'long', day:'numeric', month:'long'});
         }
@@ -360,7 +1416,7 @@
         function renderKPIs() {
             let totalT=0, totalD=0; let clientT=0, clientD=0; let epamT=0, epamD=0; let learnT=0, learnD=0; let hiPri = [];
             (window.state.projects||[]).forEach(p => {
-                p.subtasks.forEach(s => {
+                (p.subtasks||[]).forEach(s => {
                     let v = parseInt(s.progress)/100;
                     totalT++; totalD+=v;
                     if(p.type==='Work'){clientT++;clientD+=v}
@@ -369,17 +1425,23 @@
                     if(s.priority==='High' && s.progress<100) hiPri.push({t:s.title, c:p.title});
                 });
             });
-            (window.state.dsa||[]).forEach(d => {
-                totalT++; if(window.state.dsaStatus[d.id]) totalD++;
-                if(d.pri==='High' && !window.state.dsaStatus[d.id]) hiPri.push({t:d.task, c:`Day ${d.day}`});
+            
+            // DSA Stats Logic
+            let dsaTotalProblems = 0;
+            let dsaSolvedCount = 0;
+            dsaCurriculum.forEach(part => {
+                part.problems.forEach(prob => {
+                    dsaTotalProblems++;
+                    if(window.state.dsaStatus[prob.id]) dsaSolvedCount++;
+                });
             });
+            totalT += dsaTotalProblems;
+            totalD += dsaSolvedCount;
 
             const getPct = (n,d) => d ? Math.round((n/d)*100) : 0;
-            const dsaDone = Object.keys(window.state.dsaStatus||{}).length;
-            const dsaTotal = (window.state.dsa||[]).length || 1;
             
             updateDonut('kpi-overall', getPct(totalD, totalT), '#3b82f6', '%');
-            updateDonut('kpi-dsa', Math.round((dsaDone/dsaTotal)*100), '#10b981', dsaDone + '/90');
+            updateDonut('kpi-dsa', Math.round((dsaSolvedCount/dsaTotalProblems)*100), '#10b981', dsaSolvedCount);
             updateDonut('kpi-client', getPct(clientD, clientT), '#6366f1', '%');
             updateDonut('kpi-epam', getPct(epamD, epamT), '#ec4899', '%');
             updateDonut('kpi-cert', getPct(learnD, learnT), '#8b5cf6', '%');
@@ -401,37 +1463,67 @@
             text.innerText = labelType === '%' ? `${pct}%` : labelType;
         }
 
-        function renderDSA() {
-            const container = document.getElementById('dsa-list-container'); container.innerHTML = '';
-            const sorted = [...(window.state.dsa||[])].sort((a,b)=>a.day - b.day);
-            const grouped = sorted.reduce((acc,curr)=>{acc[curr.day]=acc[curr.day]||[];acc[curr.day].push(curr);return acc;},{});
-            
-            Object.keys(grouped).forEach(day => {
-                const items = grouped[day];
-                const allDone = items.every(i => window.state.dsaStatus[i.id]);
-                const card = document.createElement('div');
-                card.className = `card ${allDone ? 'bg-slate-50' : ''}`;
-                let html = `<div class="bg-slate-100/50 px-4 py-2 border-b border-slate-100 flex justify-between items-center"><span class="font-bold text-xs text-slate-500 uppercase">Day ${day}</span><span class="text-[10px] bg-white px-2 py-0.5 rounded border border-slate-200 text-slate-600 font-bold shadow-sm">${items[0].topic}</span></div>`;
-                html += `<div class="divide-y divide-slate-50">`;
-                items.forEach(i => {
-                    const done = window.state.dsaStatus[i.id];
-                    html += `<div class="p-4 flex items-center gap-3 ${done?'opacity-50 grayscale':''}">
-                        <input type="checkbox" class="w-5 h-5 rounded border-slate-300 text-emerald-600 focus:ring-emerald-500 transition" ${done?'checked':''} onchange="toggleDSA(${i.id})">
-                        <div class="flex-1 min-w-0">
-                            <a href="${i.link}" target="_blank" class="text-sm font-bold text-slate-700 hover:text-blue-600 truncate block">${i.task}</a>
-                            <div class="flex items-center gap-2 mt-1">
-                                <span class="text-[10px] px-2 py-0.5 rounded-full ${i.pri==='High'?'bg-red-100 text-red-700':i.pri==='Medium'?'bg-yellow-100 text-yellow-700':'bg-slate-100 text-slate-500'} font-bold">${i.pri}</span>
-                            </div>
+        // NEW: RENDER DSA CARDS
+        function renderDSAMastery() {
+            const container = document.getElementById('dsa-cards-container');
+            container.innerHTML = '';
+            const status = window.state.dsaStatus || {};
+            let dsaSolved = 0; let dsaTotal = 0;
+
+            dsaCurriculum.forEach(part => {
+                const totalInPart = part.problems.length;
+                const solvedInPart = part.problems.filter(p => status[p.id]).length;
+                dsaTotal += totalInPart;
+                dsaSolved += solvedInPart;
+                const partProgress = Math.round((solvedInPart/totalInPart)*100);
+                const isComplete = partProgress === 100;
+
+                const cardHTML = `
+                <div class="card p-5 border-l-4 ${isComplete ? 'border-emerald-500 bg-emerald-50/50' : 'border-blue-500'}">
+                    <div class="flex justify-between items-start mb-2">
+                        <div>
+                            <h3 class="font-bold text-slate-800 text-base">${part.title}</h3>
+                            <p class="text-xs text-slate-500 mt-1 line-clamp-2">${part.topics}</p>
                         </div>
-                        <button onclick="openEditDSAModal(${i.id})" class="w-8 h-8 flex items-center justify-center rounded-full bg-slate-50 text-slate-400 hover:bg-white hover:shadow-sm transition"><i class="ph-bold ph-pencil-simple"></i></button>
-                    </div>`;
-                });
-                html += `</div>`;
-                card.innerHTML = html;
-                container.appendChild(card);
+                        <a href="${part.learnLink}" target="_blank" class="text-blue-600 hover:text-blue-800 bg-blue-50 hover:bg-blue-100 p-2 rounded-lg transition" title="Ask ChatGPT"><i class="ph-bold ph-robot text-xl"></i></a>
+                    </div>
+                    
+                    <div class="w-full bg-slate-200 rounded-full h-1.5 mb-4 mt-2">
+                        <div class="bg-emerald-500 h-1.5 rounded-full transition-all" style="width: ${partProgress}%"></div>
+                    </div>
+
+                    <div class="space-y-2">
+                        ${part.problems.map(p => `
+                            <div class="flex items-center gap-3 p-2 rounded hover:bg-slate-50 transition border border-transparent hover:border-slate-100">
+                                <input type="checkbox" class="custom-checkbox" 
+                                    ${status[p.id] ? 'checked' : ''} 
+                                    onchange="toggleDSAProblem('${p.id}')">
+                                <a href="${p.url}" target="_blank" class="text-sm font-medium ${status[p.id] ? 'text-slate-400 line-through' : 'text-slate-700'} hover:text-blue-600 truncate flex-1">${p.name}</a>
+                                <i class="ph-bold ph-arrow-square-out text-slate-300 text-xs"></i>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>`;
+                container.innerHTML += cardHTML;
             });
-            document.getElementById('dsa-progress-text').innerText = `${Object.keys(window.state.dsaStatus||{}).length} / ${(window.state.dsa||[]).length} Solved`;
+
+            // Update Mini Chart in Header
+            if(window.miniChart) window.miniChart.destroy();
+            const ctx = document.getElementById('dsa-mini-chart');
+            if(ctx) {
+                window.miniChart = new Chart(ctx, {
+                    type: 'doughnut',
+                    data: { labels: ['Done', 'Left'], datasets: [{ data: [dsaSolved, dsaTotal-dsaSolved], backgroundColor: ['#10b981', '#e2e8f0'], borderWidth:0 }] },
+                    options: { responsive: true, maintainAspectRatio: false, cutout: '75%', plugins: { legend: { display: false }, tooltip: { enabled: false } } }
+                });
+                document.getElementById('dsa-total-progress').innerText = Math.round((dsaSolved/dsaTotal)*100) + "%";
+            }
         }
+
+        window.toggleDSAProblem = (id) => {
+            if(window.state.dsaStatus[id]) delete window.state.dsaStatus[id]; else window.state.dsaStatus[id] = true;
+            window.saveToCloud(); window.render();
+        };
 
         function renderProjects(type) {
             const el = document.getElementById(`container-${type}`);
@@ -439,7 +1531,10 @@
             if(list.length === 0) { el.innerHTML = `<div class="col-span-full p-6 text-center text-slate-400 text-sm border-2 border-dashed border-slate-200 rounded-xl">No active projects</div>`; return; }
             let color = type === 'Epam' ? 'pink' : type === 'Learning' ? 'purple' : 'blue';
             el.innerHTML = list.map(p => {
-                const total=p.subtasks.length, sum=p.subtasks.reduce((a,b)=>a+parseInt(b.progress),0); const pct = total?Math.round(sum/total):0;
+                const subs = p.subtasks || []; 
+                const total = subs.length;
+                const sum = subs.reduce((a,b)=>a+parseInt(b.progress),0); 
+                const pct = total?Math.round(sum/total):0;
                 return `<div class="card p-4 relative border-l-4 border-${color}-500">
                     <div class="flex justify-between items-start mb-3">
                         <div><h3 class="font-bold text-slate-800 text-lg">${p.title}</h3><div class="text-xs text-slate-400 font-bold mt-0.5">${total} Tasks</div></div>
@@ -449,10 +1544,10 @@
                         </div>
                     </div>
                     <div class="w-full bg-slate-100 rounded-full h-1.5 mb-4 overflow-hidden"><div class="bg-${color}-500 h-1.5 rounded-full transition-all duration-500" style="width:${pct}%"></div></div>
-                    <div class="space-y-4">${p.subtasks.map((s, idx) => `
+                    <div class="space-y-4">${subs.map((s, idx) => `
                         <div class="group">
                             <div class="flex justify-between text-xs mb-2 font-semibold text-slate-700">
-                                <span>${s.title}</span>
+                                <span class="cursor-pointer hover:text-blue-600" onclick="openEditSubtaskModal(${p.id}, ${idx})">${s.title} <i class="ph-bold ph-pencil-simple ml-1 text-slate-300"></i></span>
                                 <span class="text-${color}-600">${s.progress}%</span>
                             </div>
                             <input type="range" class="w-full h-2 bg-slate-100 rounded-lg appearance-none cursor-pointer accent-${color}-600 hover:bg-slate-200 transition" min="0" max="100" value="${s.progress}" onchange="updateSubtask(${p.id}, ${idx}, this.value)">
@@ -485,53 +1580,136 @@
         function updateCharts() {
             const ctx = document.getElementById('chart-domain'); if(window.myChart) window.myChart.destroy();
             let w=0, l=0, e=0;
-            (window.state.projects||[]).forEach(p => { const s=p.subtasks.reduce((a,b)=>a+parseInt(b.progress),0); const m=p.subtasks.length*100||1; const sc=(s/m)*100; if(p.type==='Work') w+=sc; else if(p.type==='Epam') e+=sc; else l+=sc; });
-            const d = (Object.keys(window.state.dsaStatus||{}).length/90)*100;
+            (window.state.projects||[]).forEach(p => { 
+                const subs = p.subtasks || [];
+                const s = subs.reduce((a,b)=>a+parseInt(b.progress),0); 
+                const m = subs.length*100||1; 
+                const sc = (s/m)*100; 
+                if(p.type==='Work') w+=sc; else if(p.type==='Epam') e+=sc; else l+=sc; 
+            });
+            // Chart shows progress of the 20 parts
+            let dsaSolved = 0; let dsaTotal = 0;
+            dsaCurriculum.forEach(part => { part.problems.forEach(p => { dsaTotal++; if(window.state.dsaStatus[p.id]) dsaSolved++; }); });
+            const d = dsaTotal ? Math.round((dsaSolved/dsaTotal)*100) : 0;
+
             window.myChart = new Chart(ctx, { 
                 type: 'doughnut', 
                 data: { labels: ['Work', 'Epam', 'Learn', 'DSA'], datasets: [{ data: [w||1, e||1, l||1, d||1], backgroundColor: ['#3b82f6', '#ec4899', '#8b5cf6', '#10b981'], borderWidth:0 }] }, 
-                options: { 
-                    responsive: true, 
-                    maintainAspectRatio: false, 
-                    layout: { padding: 20 },
-                    plugins:{ 
-                        legend:{ position:'bottom', labels:{ usePointStyle:true, padding: 20, font:{family:'Inter', size:11} } } 
-                    },
-                    cutout: '70%'
-                } 
+                options: { responsive: true, maintainAspectRatio: false, layout: { padding: 20 }, plugins:{ legend:{ position:'bottom', labels:{ usePointStyle:true, padding: 20, font:{family:'Inter', size:11} } } }, cutout: '70%' } 
             });
         }
 
-        // --- GLOBAL ACTIONS ---
-        window.render = function() {
-            renderKPIs();
-            renderProjects('Work'); renderProjects('Epam'); renderProjects('Learning');
-            renderDSA(); renderHealth();
-            updateCharts();
-            document.getElementById('current-date').innerText = new Date().toLocaleDateString('en-IN', {weekday:'long', day:'numeric', month:'long'});
+        // --- ACTIONS & MODALS ---
+        function showModal(html) {
+            const w = document.getElementById('modal-wrapper');
+            const c = document.getElementById('modal-body'); 
+            c.innerHTML = html;
+            w.classList.remove('hidden');
         }
-
-        function showModal(html) { const w=document.getElementById('modal-wrapper'); document.getElementById('modal-content').innerHTML=html; w.classList.remove('hidden'); }
         window.closeModal = () => document.getElementById('modal-wrapper').classList.add('hidden');
+        window.handleOutsideClick = (e) => { if(e.target.id === 'modal-wrapper') window.closeModal(); }
 
-        window.openAddDSAModal = () => showModal(`<h3 class="text-lg font-bold mb-4">Add Problem</h3><input type="number" id="inp-day" class="w-full border p-3 rounded-lg mb-3 text-sm" placeholder="Day (e.g. 5)"><input type="text" id="inp-topic" class="w-full border p-3 rounded-lg mb-3 text-sm" placeholder="Topic"><input type="text" id="inp-task" class="w-full border p-3 rounded-lg mb-3 text-sm" placeholder="Problem Name"><input type="text" id="inp-link" class="w-full border p-3 rounded-lg mb-3 text-sm" placeholder="URL"><select id="inp-pri" class="w-full border p-3 rounded-lg mb-4 text-sm bg-white"><option>Low</option><option>Medium</option><option>High</option></select><button onclick="commitDSA(null)" class="w-full bg-emerald-600 text-white py-3 rounded-lg font-bold">Add Task</button>`);
-        window.openEditDSAModal = (id) => { const item = window.state.dsa.find(i=>i.id===id); showModal(`<h3 class="text-lg font-bold mb-4">Edit Problem</h3><input type="number" id="inp-day" class="w-full border p-3 rounded-lg mb-3 text-sm" value="${item.day}"><input type="text" id="inp-topic" class="w-full border p-3 rounded-lg mb-3 text-sm" value="${item.topic}"><input type="text" id="inp-task" class="w-full border p-3 rounded-lg mb-3 text-sm" value="${item.task}"><input type="text" id="inp-link" class="w-full border p-3 rounded-lg mb-3 text-sm" value="${item.link}"><select id="inp-pri" class="w-full border p-3 rounded-lg mb-4 text-sm bg-white"><option ${item.pri==='Low'?'selected':''}>Low</option><option ${item.pri==='Medium'?'selected':''}>Medium</option><option ${item.pri==='High'?'selected':''}>High</option></select><div class="flex gap-2"><button onclick="commitDSA(${id})" class="flex-1 bg-emerald-600 text-white py-3 rounded-lg font-bold">Save</button><button onclick="deleteDSA(${id})" class="px-4 text-red-500 font-bold">Delete</button></div>`); };
-        window.commitDSA = (id) => { const day=parseInt(document.getElementById('inp-day').value); const task=document.getElementById('inp-task').value; if(!day||!task) return; const obj={day, task, topic:document.getElementById('inp-topic').value, link:document.getElementById('inp-link').value, pri:document.getElementById('inp-pri').value}; if(id) { const idx=window.state.dsa.findIndex(i=>i.id===id); if(idx!==-1) window.state.dsa[idx]={...window.state.dsa[idx], ...obj}; } else { window.state.dsa.push({id:Date.now(), ...obj}); } window.saveToCloud(); window.render(); window.closeModal(); };
-        window.deleteDSA = (id) => { if(confirm('Delete?')) { window.state.dsa = window.state.dsa.filter(i=>i.id!==id); window.saveToCloud(); window.render(); window.closeModal(); } }
-        window.openProjectModal = (type) => showModal(`<h3 class="text-lg font-bold mb-4">New Project (${type})</h3><input type="text" id="inp-ptitle" class="w-full border p-3 rounded-lg mb-4 text-sm" placeholder="Project Title"><button onclick="commitProject('${type}')" class="w-full bg-blue-600 text-white py-3 rounded-lg font-bold">Create Project</button>`);
-        window.commitProject = (type) => { const t = document.getElementById('inp-ptitle').value; if(t) { window.state.projects.push({id:Date.now(), title:t, type, subtasks:[]}); window.saveToCloud(); window.render(); window.closeModal(); } };
-        window.openSubtaskModal = (pid) => showModal(`<h3 class="text-lg font-bold mb-4">Add Task</h3><input type="text" id="inp-stitle" class="w-full border p-3 rounded-lg mb-3 text-sm" placeholder="Task Name"><select id="inp-spri" class="w-full border p-3 rounded-lg mb-4 text-sm bg-white"><option>Low</option><option>Medium</option><option>High</option></select><button onclick="commitSubtask(${pid})" class="w-full bg-blue-600 text-white py-3 rounded-lg font-bold">Add Task</button>`);
-        window.commitSubtask = (pid) => { const t = document.getElementById('inp-stitle').value; const p = document.getElementById('inp-spri').value; if(t) { window.state.projects.find(x=>x.id===pid).subtasks.push({title:t, priority:p, progress:0}); window.saveToCloud(); window.render(); window.closeModal(); } };
-        window.openRoutineModal = () => { const items = window.state.routine.map((r,i) => `<div class="flex gap-2 mb-2"><input class="w-20 border p-2 rounded text-sm r-time" type="time" value="${r.time}"><input class="flex-1 border p-2 rounded text-sm r-text" type="text" value="${r.text}"></div>`).join(''); showModal(`<h3 class="text-lg font-bold mb-4">Edit Routine</h3><div id="r-list" class="max-h-60 overflow-y-auto mb-4">${items}</div><div class="flex gap-2"><button onclick="addRoutineRow()" class="px-4 py-2 border rounded-lg text-sm">+ Add</button><button onclick="commitRoutine()" class="flex-1 bg-slate-800 text-white rounded-lg text-sm font-bold">Save</button></div>`); };
-        window.addRoutineRow = () => { const d = document.createElement('div'); d.className='flex gap-2 mb-2'; d.innerHTML = `<input class="w-20 border p-2 rounded text-sm r-time" type="time"><input class="flex-1 border p-2 rounded text-sm r-text" type="text">`; document.getElementById('r-list').appendChild(d); };
-        window.commitRoutine = () => { const newR = []; document.querySelectorAll('#r-list > div').forEach((d,i) => { const time = d.querySelector('.r-time').value; const text = d.querySelector('.r-text').value; if(text) newR.push({id:i+1, time, text}); }); window.state.routine = newR; window.saveToCloud(); window.render(); window.closeModal(); };
-        window.toggleHealthItem = (id) => { if(window.state.todayHealth.includes(id)) window.state.todayHealth = window.state.todayHealth.filter(i=>i!==id); else window.state.todayHealth.push(id); window.saveToCloud(); window.render(); };
-        window.saveHealthDay = () => { const date = new Date().toISOString().split('T')[0]; window.state.healthHistory[date] = [...window.state.todayHealth]; window.saveToCloud(); alert("Day Saved!"); window.render(); };
-        window.toggleDSA = (id) => { if(window.state.dsaStatus[id]) delete window.state.dsaStatus[id]; else window.state.dsaStatus[id] = true; window.saveToCloud(); window.render(); };
-        window.updateSubtask = (pid, idx, val) => { window.state.projects.find(x=>x.id===pid).subtasks[idx].progress = val; window.saveToCloud(); window.render(); };
-        window.deleteProject = (id) => { if(confirm('Delete Project?')) { window.state.projects = window.state.projects.filter(p=>p.id!==id); window.saveToCloud(); window.render(); } };
-        window.exportData = () => { const d = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(window.state)); const a = document.createElement('a'); a.href = d; a.download = "sdet_backup.json"; a.click(); };
-        window.resetApp = () => { if(confirm("Reset Everything?")) { window.state = {projects:[], dsa:[], dsaStatus:{}, routine:[], healthHistory:{}, todayHealth:[]}; window.saveToCloud(); location.reload(); }};
+        window.openProjectModal = (type) => showModal(`
+            <h3 class="text-lg font-bold mb-4">New Project (${type})</h3>
+            <input type="text" id="inp-ptitle" class="w-full border p-3 rounded-lg mb-4 text-sm" placeholder="Project Title">
+            <button onclick="commitProject('${type}')" class="w-full bg-blue-600 text-white py-3 rounded-lg font-bold">Create Project</button>
+        `);
+
+        window.commitProject = (type) => {
+            const t = document.getElementById('inp-ptitle').value;
+            if(t) { 
+                if(!window.state.projects) window.state.projects = [];
+                window.state.projects.push({id:Date.now(), title:t, type, subtasks:[]}); 
+                window.saveToCloud(); window.render(); window.closeModal(); 
+            }
+        };
+
+        window.openSubtaskModal = (pid) => showModal(`
+            <h3 class="text-lg font-bold mb-4">Add Task</h3>
+            <input type="text" id="inp-stitle" class="w-full border p-3 rounded-lg mb-3 text-sm" placeholder="Task Name">
+            <select id="inp-spri" class="w-full border p-3 rounded-lg mb-4 text-sm bg-white"><option>Low</option><option>Medium</option><option>High</option></select>
+            <button onclick="commitSubtask(${pid})" class="w-full bg-blue-600 text-white py-3 rounded-lg font-bold">Add Task</button>
+        `);
+
+        window.commitSubtask = (pid) => {
+            const t = document.getElementById('inp-stitle').value;
+            const p = document.getElementById('inp-spri').value;
+            if(t) { 
+                const proj = window.state.projects.find(x=>x.id===pid);
+                if(!proj.subtasks) proj.subtasks = [];
+                proj.subtasks.push({title:t, priority:p, progress:0}); 
+                window.saveToCloud(); window.render(); window.closeModal(); 
+            }
+        };
+
+        window.openEditSubtaskModal = (pid, sidx) => {
+            const proj = window.state.projects.find(x=>x.id===pid);
+            const task = proj.subtasks[sidx];
+            showModal(`
+                <h3 class="text-lg font-bold mb-4">Edit Task</h3>
+                <input type="text" id="edit-stitle" class="w-full border p-3 rounded-lg mb-3 text-sm" value="${task.title}">
+                <select id="edit-spri" class="w-full border p-3 rounded-lg mb-4 text-sm bg-white">
+                    <option ${task.priority==='Low'?'selected':''}>Low</option>
+                    <option ${task.priority==='Medium'?'selected':''}>Medium</option>
+                    <option ${task.priority==='High'?'selected':''}>High</option>
+                </select>
+                <div class="flex gap-2">
+                    <button onclick="commitSubtaskEdit(${pid}, ${sidx})" class="flex-1 bg-blue-600 text-white py-3 rounded-lg font-bold">Save</button>
+                    <button onclick="deleteSubtask(${pid}, ${sidx})" class="px-4 text-red-500 font-bold">Delete</button>
+                </div>
+            `);
+        };
+
+        window.commitSubtaskEdit = (pid, sidx) => {
+            const t = document.getElementById('edit-stitle').value;
+            const p = document.getElementById('edit-spri').value;
+            const proj = window.state.projects.find(x=>x.id===pid);
+            proj.subtasks[sidx].title = t;
+            proj.subtasks[sidx].priority = p;
+            window.saveToCloud(); window.render(); window.closeModal();
+        };
+
+        window.deleteSubtask = (pid, sidx) => {
+            if(confirm('Delete Task?')) {
+                const proj = window.state.projects.find(x=>x.id===pid);
+                proj.subtasks.splice(sidx, 1);
+                window.saveToCloud(); window.render(); window.closeModal();
+            }
+        };
+
+        window.openRoutineModal = () => {
+            const items = (window.state.routine || []).map((r,i) => `
+                <div class="flex gap-2 mb-2 routine-row">
+                    <input class="w-20 border p-2 rounded text-sm r-time" type="time" value="${r.time}">
+                    <input class="flex-1 border p-2 rounded text-sm r-text" type="text" value="${r.text}">
+                </div>
+            `).join('');
+            showModal(`
+                <h3 class="text-lg font-bold mb-4">Edit Routine</h3>
+                <div id="r-list" class="max-h-60 overflow-y-auto mb-4">${items}</div>
+                <div class="flex gap-2">
+                    <button onclick="addRoutineRow()" class="px-4 py-2 border rounded-lg text-sm">+ Add</button>
+                    <button onclick="commitRoutine()" class="flex-1 bg-slate-800 text-white rounded-lg text-sm font-bold">Save</button>
+                </div>
+            `);
+        };
+
+        window.addRoutineRow = () => {
+            const d = document.createElement('div'); d.className='flex gap-2 mb-2 routine-row';
+            d.innerHTML = `<input class="w-20 border p-2 rounded text-sm r-time" type="time"><input class="flex-1 border p-2 rounded text-sm r-text" type="text">`;
+            document.getElementById('r-list').appendChild(d);
+        };
+
+        window.commitRoutine = () => {
+            const newR = [];
+            document.querySelectorAll('.routine-row').forEach((d,i) => {
+                const time = d.querySelector('.r-time').value;
+                const text = d.querySelector('.r-text').value;
+                if(text) newR.push({id:i+1, time, text});
+            });
+            window.state.routine = newR;
+            window.saveToCloud(); window.render(); window.closeModal();
+        };
 
         // Router
         window.router = (view) => {
@@ -544,7 +1722,28 @@
             if(view === 'dashboard') updateCharts();
         };
 
-        // Init
+        // Actions Wrappers
+        window.toggleHealthItem = (id) => {
+            if(window.state.todayHealth.includes(id)) window.state.todayHealth = window.state.todayHealth.filter(i=>i!==id);
+            else window.state.todayHealth.push(id);
+            window.saveToCloud(); window.render();
+        };
+        window.saveHealthDay = () => {
+            const date = new Date().toISOString().split('T')[0];
+            window.state.healthHistory[date] = [...window.state.todayHealth];
+            window.saveToCloud(); alert("Day Saved!"); window.render();
+        };
+        window.updateSubtask = (pid, idx, val) => {
+            window.state.projects.find(x=>x.id===pid).subtasks[idx].progress = val;
+            window.saveToCloud(); window.render();
+        };
+        window.deleteProject = (id) => {
+            if(confirm('Delete Project?')) { window.state.projects = window.state.projects.filter(p=>p.id!==id); window.saveToCloud(); window.render(); }
+        };
+        window.exportData = () => { const d = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(window.state)); const a = document.createElement('a'); a.href = d; a.download = "sdet_backup.json"; a.click(); };
+        window.resetApp = () => { if(confirm("Reset Everything?")) { window.state = {projects:[], dsaStatus:{}, routine:[], healthHistory:{}, todayHealth:[]}; window.saveToCloud(); location.reload(); }};
+
+        // Initial Load (if offline)
         if(!db) window.render(); window.router('dashboard');
     </script>
 </body>
