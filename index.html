@@ -2,66 +2,39 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>SDET Planner | Mobile</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>SDET Planner | Stable v15</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap');
-        body { background-color: #f1f5f9; font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparent; }
-        
-        /* Modern Card Styling */
-        .card { 
-            background: white; 
-            border-radius: 1rem; 
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.02), 0 2px 4px -1px rgba(0, 0, 0, 0.02);
-            transition: transform 0.2s;
-            border: 1px solid #f1f5f9;
-        }
-        
-        /* CSS Donut Chart */
-        .donut-ring {
-            width: 60px; height: 60px;
-            border-radius: 50%;
-            background: conic-gradient(var(--color) calc(var(--percent) * 1%), #e2e8f0 0);
-            position: relative;
-            display: flex; justify-content: center; align-items: center;
-        }
-        .donut-ring::before {
-            content: ''; position: absolute;
-            width: 48px; height: 48px;
-            background: white; border-radius: 50%;
-        }
-        .donut-text { position: relative; font-size: 0.75rem; font-weight: 700; color: #334155; }
-
-        /* Mobile Nav */
-        .mobile-nav-item {
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
-            padding: 8px 0; flex: 1; color: #64748b; font-size: 0.7rem; font-weight: 600;
-        }
-        .mobile-nav-item.active { color: #2563eb; }
-        .mobile-nav-item i { font-size: 1.4rem; margin-bottom: 2px; }
-
-        /* Desktop Sidebar */
-        .sidebar-item { transition: all 0.2s; display: flex; align-items: center; gap: 12px; padding: 12px 16px; border-radius: 8px; color: #64748b; font-weight: 500; cursor: pointer; }
-        .sidebar-item:hover, .sidebar-item.active { background-color: #eff6ff; color: #2563eb; }
-
-        /* Utilities */
-        ::-webkit-scrollbar { width: 0px; background: transparent; }
-        .loader { border: 3px solid #f3f3f3; border-top: 3px solid #3b82f6; border-radius: 50%; width: 24px; height: 24px; animation: spin 1s linear infinite; }
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap');
+        :root { --safe-bottom: env(safe-area-inset-bottom); }
+        body { background-color: #f8fafc; font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparent; }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        .card { background: white; border-radius: 1rem; box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05), 0 1px 2px -1px rgba(0, 0, 0, 0.01); border: 1px solid #f1f5f9; }
+        .donut-ring { width: 56px; height: 56px; border-radius: 50%; background: conic-gradient(var(--color) calc(var(--percent) * 1%), #f1f5f9 0); position: relative; display: flex; justify-content: center; align-items: center; transition: background 0.5s ease; }
+        .donut-ring::before { content: ''; position: absolute; width: 44px; height: 44px; background: white; border-radius: 50%; }
+        .donut-text { position: relative; font-size: 0.7rem; font-weight: 800; color: #334155; }
+        .nav-btn { transition: all 0.2s; color: #94a3b8; }
+        .nav-btn.active { color: #2563eb; transform: scale(1.05); }
+        .sidebar-item { display: flex; align-items: center; gap: 12px; padding: 12px 16px; border-radius: 12px; color: #64748b; font-weight: 500; cursor: pointer; transition: all 0.2s; }
+        .sidebar-item:hover { background-color: #f8fafc; color: #1e293b; }
+        .sidebar-item.active { background-color: #eff6ff; color: #2563eb; font-weight: 600; }
+        .loader { border: 3px solid #e2e8f0; border-top: 3px solid #3b82f6; border-radius: 50%; width: 20px; height: 20px; animation: spin 1s linear infinite; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     </style>
 </head>
-<body class="flex h-screen overflow-hidden text-slate-800">
+<body class="flex h-screen overflow-hidden text-slate-800 bg-slate-50">
 
-    <aside class="w-64 bg-white border-r border-slate-200 flex-col justify-between hidden md:flex z-20">
+    <aside class="w-72 bg-white border-r border-slate-200 flex-col justify-between hidden md:flex z-30">
         <div>
-            <div class="p-6 flex items-center gap-3 text-slate-800 font-bold text-xl tracking-tight">
-                <div class="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center text-white"><i class="ph-bold ph-rocket-launch"></i></div>
-                <span>Planner</span>
+            <div class="p-8 flex items-center gap-3">
+                <div class="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center text-white shadow-blue-200 shadow-lg"><i class="ph-bold ph-rocket-launch text-xl"></i></div>
+                <div><h1 class="font-bold text-lg leading-tight text-slate-900">Planner</h1><p class="text-xs text-slate-400 font-medium">SDET Edition</p></div>
             </div>
-            <nav class="px-4 space-y-1">
+            <nav class="px-6 space-y-1">
                 <button onclick="router('dashboard')" id="d-nav-dashboard" class="sidebar-item active w-full"><i class="ph ph-squares-four text-lg"></i> Dashboard</button>
                 <button onclick="router('dsa')" id="d-nav-dsa" class="sidebar-item w-full"><i class="ph ph-brackets-curly text-lg"></i> 90-Day DSA</button>
                 <button onclick="router('projects')" id="d-nav-projects" class="sidebar-item w-full"><i class="ph ph-briefcase text-lg"></i> Client Work</button>
@@ -70,150 +43,94 @@
                 <button onclick="router('health')" id="d-nav-health" class="sidebar-item w-full"><i class="ph ph-heartbeat text-lg"></i> Routine</button>
             </nav>
         </div>
-        <div class="p-4 border-t border-slate-100">
-            <div class="flex items-center gap-2 justify-center text-xs text-slate-400 mb-2">
-                <div id="sync-status-icon" class="w-2 h-2 rounded-full bg-red-500"></div>
-                <span id="sync-status-text">Connecting...</span>
+        <div class="p-6 border-t border-slate-100 bg-slate-50/50">
+            <div class="flex items-center gap-2 justify-center text-xs font-semibold text-slate-400 mb-3">
+                <div id="sync-status-icon" class="w-2 h-2 rounded-full bg-red-500"></div><span id="sync-status-text">Connecting...</span>
             </div>
-            <button onclick="exportData()" class="w-full text-xs text-blue-600 font-bold py-2 bg-blue-50 rounded">Backup Data</button>
+            <button onclick="exportData()" class="w-full text-xs text-slate-600 font-bold py-2.5 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 transition shadow-sm">Backup Data</button>
         </div>
     </aside>
 
-    <main class="flex-1 overflow-y-auto overflow-x-hidden relative bg-slate-50 pb-24 md:pb-0">
-        
-        <header class="bg-white/80 backdrop-blur-md sticky top-0 z-10 border-b border-slate-200 px-6 py-4 flex justify-between items-center">
-            <div>
-                <h1 class="text-xl font-bold text-slate-900" id="page-title">Overview</h1>
-                <p class="text-slate-500 text-xs font-medium mt-0.5" id="current-date">...</p>
-            </div>
-            <div class="flex items-center gap-3">
-                <div id="loading-spinner" class="hidden"><div class="loader"></div></div>
-                <button onclick="resetApp()" class="md:hidden text-slate-400"><i class="ph-bold ph-trash"></i></button>
-            </div>
+    <main class="flex-1 overflow-y-auto no-scrollbar relative bg-slate-50 pb-32 md:pb-8">
+        <header class="sticky top-0 z-20 bg-white/80 backdrop-blur-md border-b border-slate-200 px-6 py-4 flex justify-between items-center shadow-sm">
+            <div><h1 class="text-xl font-bold text-slate-900 tracking-tight" id="page-title">Overview</h1><p class="text-slate-500 text-xs font-medium" id="current-date">Loading...</p></div>
+            <div class="flex items-center gap-4"><div id="loading-spinner" class="hidden"><div class="loader"></div></div><button onclick="resetApp()" class="md:hidden text-slate-400 p-2"><i class="ph-bold ph-trash"></i></button></div>
         </header>
 
         <div class="p-4 md:p-8 max-w-7xl mx-auto">
-
             <div id="view-dashboard" class="space-y-6">
                 <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 md:gap-4">
-                    <div class="card p-4 flex flex-col items-center justify-center gap-2" id="kpi-overall">
-                        <div class="donut-ring" style="--percent:0; --color:#3b82f6"><span class="donut-text">0%</span></div>
-                        <span class="text-xs font-bold text-slate-500 text-center">Overall</span>
-                    </div>
-                    <div class="card p-4 flex flex-col items-center justify-center gap-2" id="kpi-dsa">
-                        <div class="donut-ring" style="--percent:0; --color:#10b981"><span class="donut-text">0</span></div>
-                        <span class="text-xs font-bold text-slate-500 text-center">DSA (90)</span>
-                    </div>
-                    <div class="card p-4 flex flex-col items-center justify-center gap-2" id="kpi-client">
-                        <div class="donut-ring" style="--percent:0; --color:#6366f1"><span class="donut-text">0%</span></div>
-                        <span class="text-xs font-bold text-slate-500 text-center">Client</span>
-                    </div>
-                    <div class="card p-4 flex flex-col items-center justify-center gap-2" id="kpi-epam">
-                        <div class="donut-ring" style="--percent:0; --color:#ec4899"><span class="donut-text">0%</span></div>
-                        <span class="text-xs font-bold text-slate-500 text-center">Epam</span>
-                    </div>
-                    <div class="card p-4 flex flex-col items-center justify-center gap-2" id="kpi-cert">
-                        <div class="donut-ring" style="--percent:0; --color:#8b5cf6"><span class="donut-text">0%</span></div>
-                        <span class="text-xs font-bold text-slate-500 text-center">Certs</span>
-                    </div>
-                    <div class="card p-4 flex flex-col items-center justify-center gap-2" id="kpi-streak">
-                        <div class="donut-ring" style="--percent:0; --color:#f59e0b"><span class="donut-text">0</span></div>
-                        <span class="text-xs font-bold text-slate-500 text-center">Streak</span>
-                    </div>
+                    <div class="card p-4 flex flex-col items-center justify-center gap-3" id="kpi-overall"><div class="donut-ring" style="--percent:0; --color:#3b82f6"><span class="donut-text">0%</span></div><span class="text-[11px] font-bold text-slate-500 uppercase tracking-wide">Overall</span></div>
+                    <div class="card p-4 flex flex-col items-center justify-center gap-3" id="kpi-dsa"><div class="donut-ring" style="--percent:0; --color:#10b981"><span class="donut-text">0</span></div><span class="text-[11px] font-bold text-slate-500 uppercase tracking-wide">DSA (90)</span></div>
+                    <div class="card p-4 flex flex-col items-center justify-center gap-3" id="kpi-client"><div class="donut-ring" style="--percent:0; --color:#6366f1"><span class="donut-text">0%</span></div><span class="text-[11px] font-bold text-slate-500 uppercase tracking-wide">Client</span></div>
+                    <div class="card p-4 flex flex-col items-center justify-center gap-3" id="kpi-epam"><div class="donut-ring" style="--percent:0; --color:#ec4899"><span class="donut-text">0%</span></div><span class="text-[11px] font-bold text-slate-500 uppercase tracking-wide">Epam</span></div>
+                    <div class="card p-4 flex flex-col items-center justify-center gap-3" id="kpi-cert"><div class="donut-ring" style="--percent:0; --color:#8b5cf6"><span class="donut-text">0%</span></div><span class="text-[11px] font-bold text-slate-500 uppercase tracking-wide">Certs</span></div>
+                    <div class="card p-4 flex flex-col items-center justify-center gap-3" id="kpi-streak"><div class="donut-ring" style="--percent:0; --color:#f59e0b"><span class="donut-text">0</span></div><span class="text-[11px] font-bold text-slate-500 uppercase tracking-wide">Streak</span></div>
                 </div>
-
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                    <div class="card p-5 h-80 flex flex-col">
-                        <h3 class="font-bold text-slate-700 mb-4 flex items-center gap-2 text-sm uppercase tracking-wide">
-                            <i class="ph-fill ph-fire text-orange-500"></i> High Priority
-                        </h3>
-                        <div id="focus-list" class="space-y-2 overflow-y-auto flex-1 pr-1"></div>
+                    <div class="card p-5 h-[340px] flex flex-col">
+                        <div class="flex items-center gap-2 mb-4 pb-2 border-b border-slate-100"><div class="w-6 h-6 rounded-full bg-orange-100 flex items-center justify-center text-orange-600"><i class="ph-fill ph-fire"></i></div><h3 class="font-bold text-slate-800 text-sm uppercase tracking-wide">High Priority</h3></div>
+                        <div id="focus-list" class="space-y-2 overflow-y-auto flex-1 pr-1 custom-scroll"></div>
                     </div>
-                    <div class="card p-5 h-80">
-                        <h3 class="font-bold text-slate-700 mb-2 text-sm uppercase tracking-wide">Effort Distribution</h3>
-                        <div class="h-full pb-6"><canvas id="chart-domain"></canvas></div>
+                    <div class="card p-5 h-[340px] flex flex-col">
+                        <div class="flex items-center gap-2 mb-2"><div class="w-6 h-6 rounded-full bg-blue-100 flex items-center justify-center text-blue-600"><i class="ph-fill ph-chart-pie-slice"></i></div><h3 class="font-bold text-slate-800 text-sm uppercase tracking-wide">Effort Split</h3></div>
+                        <div class="flex-1 relative w-full h-full flex items-center justify-center"><canvas id="chart-domain"></canvas></div>
                     </div>
                 </div>
             </div>
 
             <div id="view-dsa" class="hidden space-y-4">
-                <div class="card p-4 sticky top-20 z-10 shadow-lg border-emerald-100 border-b-4 border-emerald-500">
+                <div class="card p-4 sticky top-0 z-10 shadow-md border-b-2 border-emerald-500 rounded-none -mx-4 md:rounded-xl md:mx-0">
                     <div class="flex justify-between items-center">
-                        <div>
-                            <h2 class="text-lg font-bold text-slate-800">DSA Roadmap</h2>
-                            <p class="text-xs text-slate-500" id="dsa-progress-text">0% Completed</p>
-                        </div>
-                        <button onclick="openAddDSAModal()" class="bg-emerald-600 text-white w-10 h-10 rounded-full flex items-center justify-center shadow-lg active:scale-95 transition"><i class="ph-bold ph-plus text-xl"></i></button>
+                        <div><h2 class="text-lg font-bold text-slate-900">90-Day Roadmap</h2><p class="text-xs text-slate-500 font-medium" id="dsa-progress-text">Loading...</p></div>
+                        <button onclick="openAddDSAModal()" class="bg-emerald-600 text-white w-10 h-10 rounded-full flex items-center justify-center shadow-lg hover:bg-emerald-700 active:scale-95 transition"><i class="ph-bold ph-plus text-lg"></i></button>
                     </div>
                 </div>
-                <div id="dsa-list-container" class="space-y-4">
-                    </div>
+                <div id="dsa-list-container" class="space-y-3 pb-4"></div>
             </div>
 
             <div id="view-projects" class="hidden space-y-4">
-                <div class="flex justify-between items-center mb-2">
-                    <h2 class="text-xl font-bold text-slate-800">Client Work</h2>
-                    <button onclick="openProjectModal('Work')" class="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-semibold shadow hover:bg-blue-700">+ New</button>
-                </div>
+                <div class="flex justify-between items-center mb-2 px-1"><h2 class="text-xl font-bold text-slate-800">Client Work</h2><button onclick="openProjectModal('Work')" class="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-semibold shadow-md hover:bg-blue-700">+ New Project</button></div>
                 <div id="container-Work" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
             </div>
-
             <div id="view-epam" class="hidden space-y-4">
-                <div class="flex justify-between items-center mb-2">
-                    <h2 class="text-xl font-bold text-pink-700">Epam / Personal</h2>
-                    <button onclick="openProjectModal('Epam')" class="bg-pink-600 text-white px-4 py-2 rounded-lg text-sm font-semibold shadow hover:bg-pink-700">+ New</button>
-                </div>
+                <div class="flex justify-between items-center mb-2 px-1"><h2 class="text-xl font-bold text-pink-700">Epam / Personal</h2><button onclick="openProjectModal('Epam')" class="bg-pink-600 text-white px-4 py-2 rounded-lg text-sm font-semibold shadow-md hover:bg-pink-700">+ New Project</button></div>
                 <div id="container-Epam" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
             </div>
-
             <div id="view-learning" class="hidden space-y-4">
-                <div class="flex justify-between items-center mb-2">
-                    <h2 class="text-xl font-bold text-purple-700">Certifications</h2>
-                    <button onclick="openProjectModal('Learning')" class="bg-purple-600 text-white px-4 py-2 rounded-lg text-sm font-semibold shadow hover:bg-purple-700">+ New</button>
-                </div>
+                <div class="flex justify-between items-center mb-2 px-1"><h2 class="text-xl font-bold text-purple-700">Certifications</h2><button onclick="openProjectModal('Learning')" class="bg-purple-600 text-white px-4 py-2 rounded-lg text-sm font-semibold shadow-md hover:bg-purple-700">+ New Cert</button></div>
                 <div id="container-Learning" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
             </div>
 
             <div id="view-health" class="hidden space-y-4">
-                <div class="card p-5 border-t-4 border-orange-500">
-                    <div class="flex justify-between items-center mb-6">
-                        <h3 class="font-bold text-lg">Today's Routine</h3>
-                        <button onclick="openRoutineModal()" class="text-xs bg-slate-100 px-3 py-1.5 rounded-full font-bold text-slate-600">Edit</button>
-                    </div>
+                <div class="card p-6 border-t-4 border-orange-500">
+                    <div class="flex justify-between items-center mb-6"><h3 class="font-bold text-lg text-slate-800">Today's Routine</h3><button onclick="openRoutineModal()" class="text-xs bg-slate-100 px-3 py-1.5 rounded-full font-bold text-slate-600 border border-slate-200">Edit List</button></div>
                     <div id="health-today-list" class="space-y-3"></div>
-                    <button onclick="saveHealthDay()" class="mt-8 w-full bg-slate-900 text-white py-3 rounded-xl font-bold text-sm shadow-lg active:scale-95 transition">Finish Day</button>
+                    <button onclick="saveHealthDay()" class="mt-8 w-full bg-slate-900 text-white py-3.5 rounded-xl font-bold text-sm shadow-lg active:scale-95 transition flex items-center justify-center gap-2"><i class="ph-bold ph-check"></i> Finish Day</button>
                 </div>
-                <div class="card p-5">
-                    <h3 class="font-bold text-sm text-slate-500 uppercase mb-4">History Log</h3>
-                    <div class="overflow-y-auto max-h-64">
-                        <table class="w-full text-sm">
-                            <tbody id="health-history-body"></tbody>
-                        </table>
-                    </div>
-                </div>
+                <div class="card p-6"><h3 class="font-bold text-xs text-slate-400 uppercase tracking-widest mb-4">Consistency Log</h3><div class="overflow-y-auto max-h-64"><table class="w-full text-sm"><thead class="text-left text-xs text-slate-400 border-b border-slate-100"><tr><th class="pb-2">Date</th><th class="pb-2 text-right">Score</th></tr></thead><tbody id="health-history-body"></tbody></table></div></div>
             </div>
-
         </div>
     </main>
 
-    <div class="md:hidden fixed bottom-0 left-0 w-full bg-white border-t border-slate-200 flex justify-around items-center pb-safe pt-1 z-30 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)]">
-        <button onclick="router('dashboard')" id="m-nav-dashboard" class="mobile-nav-item active"><i class="ph-fill ph-squares-four"></i><span>Home</span></button>
-        <button onclick="router('dsa')" id="m-nav-dsa" class="mobile-nav-item"><i class="ph-bold ph-brackets-curly"></i><span>DSA</span></button>
-        <button onclick="router('projects')" id="m-nav-projects" class="mobile-nav-item"><i class="ph-bold ph-briefcase"></i><span>Work</span></button>
-        <button onclick="router('epam')" id="m-nav-epam" class="mobile-nav-item"><i class="ph-bold ph-code"></i><span>Epam</span></button>
-        <button onclick="router('learning')" id="m-nav-learning" class="mobile-nav-item"><i class="ph-bold ph-student"></i><span>Learn</span></button>
-        <button onclick="router('health')" id="m-nav-health" class="mobile-nav-item"><i class="ph-bold ph-heartbeat"></i><span>Habit</span></button>
+    <div class="md:hidden fixed bottom-0 left-0 w-full bg-white border-t border-slate-200 flex justify-between items-center px-6 pb-[calc(1rem+env(safe-area-inset-bottom))] pt-3 z-40 shadow-[0_-4px_20px_rgba(0,0,0,0.05)]">
+        <button onclick="router('dashboard')" id="m-nav-dashboard" class="nav-btn active flex flex-col items-center gap-1"><i class="ph-fill ph-squares-four text-2xl"></i><span class="text-[10px] font-semibold">Home</span></button>
+        <button onclick="router('dsa')" id="m-nav-dsa" class="nav-btn flex flex-col items-center gap-1"><i class="ph-bold ph-brackets-curly text-2xl"></i><span class="text-[10px] font-medium">DSA</span></button>
+        <button onclick="router('projects')" id="m-nav-projects" class="nav-btn flex flex-col items-center gap-1"><i class="ph-bold ph-briefcase text-2xl"></i><span class="text-[10px] font-medium">Work</span></button>
+        <button onclick="router('epam')" id="m-nav-epam" class="nav-btn flex flex-col items-center gap-1"><i class="ph-bold ph-code text-2xl"></i><span class="text-[10px] font-medium">Epam</span></button>
+        <button onclick="router('learning')" id="m-nav-learning" class="nav-btn flex flex-col items-center gap-1"><i class="ph-bold ph-certificate text-2xl"></i><span class="text-[10px] font-medium">Learn</span></button>
+        <button onclick="router('health')" id="m-nav-health" class="nav-btn flex flex-col items-center gap-1"><i class="ph-bold ph-heartbeat text-2xl"></i><span class="text-[10px] font-medium">Habit</span></button>
     </div>
 
-    <div id="modal-wrapper" class="fixed inset-0 bg-black/60 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4">
-        <div id="modal-content" class="bg-white rounded-2xl w-full max-w-sm p-6 shadow-2xl transform transition-all scale-100"></div>
+    <div id="modal-wrapper" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4">
+        <div id="modal-content" class="bg-white rounded-2xl w-full max-w-sm p-6 shadow-2xl transform transition-all scale-100 border border-slate-100"></div>
     </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
         import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
-        // --- PASTE FIREBASE KEYS HERE ---
+        // --- YOUR FIREBASE KEYS ---
         const firebaseConfig = {
             apiKey: "AIzaSyDSeqlg_QIEzHx2n15GcOP5jgKZzQ_MzZg",
             authDomain: "sdet-dashboard.firebaseapp.com",
@@ -224,72 +141,15 @@
             appId: "1:917849703698:web:764162e0198e5cf9439fcb"
         };
 
-        let app, db, firebaseActive = false;
-
-        try {
-            app = initializeApp(firebaseConfig);
-            db = getDatabase(app);
-            firebaseActive = true;
-            const starCountRef = ref(db, 'sdet_dashboard');
-            onValue(starCountRef, (snapshot) => {
-                const data = snapshot.val();
-                if(data) {
-                    window.state = data;
-                    if (!window.state.projects) window.state.projects = [];
-                    if (!window.state.dsa) window.state.dsa = [];
-                    if (!window.state.dsaStatus) window.state.dsaStatus = {};
-                    if (!window.state.routine) window.state.routine = [];
-                    if (!window.state.healthHistory) window.state.healthHistory = {};
-                    if (!window.state.todayHealth) window.state.todayHealth = [];
-                    
-                    if(window.state.dsa.length > 0 && !window.state.dsa[0].id) { 
-                        window.state.dsa = window.state.dsa.map((x,i) => ({...x, id: Date.now()+i})); 
-                    }
-                    window.render();
-                    updateSyncStatus(true);
-                } else {
-                    window.saveToCloud();
-                }
-            }, (error) => { updateSyncStatus(false); });
-        } catch(e) { updateSyncStatus(false); }
-
-        window.saveToCloud = function() {
-            if(firebaseActive && db && window.state) {
-                document.getElementById('loading-spinner').classList.remove('hidden');
-                const cleanState = JSON.parse(JSON.stringify(window.state));
-                set(ref(db, 'sdet_dashboard'), cleanState).then(() => {
-                    document.getElementById('loading-spinner').classList.add('hidden');
-                }).catch(e => { document.getElementById('loading-spinner').classList.add('hidden'); });
-            }
-        }
-
-        function updateSyncStatus(connected) {
-            const icon = document.getElementById('sync-status-icon');
-            const text = document.getElementById('sync-status-text');
-            if(icon && text) {
-                if(connected) {
-                    icon.className = "w-2 h-2 rounded-full bg-emerald-500 animate-pulse";
-                    text.innerText = "Online";
-                } else {
-                    icon.className = "w-2 h-2 rounded-full bg-slate-400";
-                    text.innerText = "Offline";
-                }
-            }
-        }
-    </script>
-
-    <script>
-        // --- DEFAULT DATA ---
-        const dsa90Days = [
-            { day: 1, topic: "Arrays", task: "Build Array Permutation", link: "https://leetcode.com/problems/build-array-from-permutation/", pri: "Low" },
-            { day: 2, topic: "Arrays", task: "Contains Duplicate", link: "https://leetcode.com/problems/contains-duplicate/", pri: "Low" }
-        ];
-        for(let i=3; i<=90; i++) {
+        // --- DATA DEFAULTS ---
+        const dsa90Days = [ { day: 1, topic: "Arrays", task: "Build Array Permutation", link: "https://leetcode.com/problems/build-array-from-permutation/", pri: "Low" } ];
+        for(let i=2; i<=90; i++) {
             let topic = i<30?"Strings":i<50?"Stacks":i<70?"Trees":"DP";
             dsa90Days.push({day: i, topic: topic, task: `Problem Day ${i}`, link: "#", pri: "Medium"});
         }
         const dsaWithIds = dsa90Days.map((x, i) => ({ ...x, id: Date.now() + i }));
 
+        // STATE
         window.state = {
             projects: [],
             dsa: dsaWithIds,
@@ -299,17 +159,10 @@
             todayHealth: []
         };
 
-        // --- RENDER SYSTEM ---
-        window.render = function() {
-            renderKPIs();
-            renderProjects('Work'); renderProjects('Epam'); renderProjects('Learning');
-            renderDSA(); renderHealth();
-            updateCharts();
-            document.getElementById('current-date').innerText = new Date().toLocaleDateString('en-IN', {weekday:'long', day:'numeric', month:'short'});
-        }
+        // --- HELPER FUNCTIONS ---
+        function getPct(n, d) { return d ? Math.round((n/d)*100) : 0; }
 
         function renderKPIs() {
-            // Calculate Stats
             let totalT=0, totalD=0; let clientT=0, clientD=0; let epamT=0, epamD=0; let learnT=0, learnD=0; let hiPri = [];
             (window.state.projects||[]).forEach(p => {
                 p.subtasks.forEach(s => {
@@ -326,25 +179,20 @@
                 if(d.pri==='High' && !window.state.dsaStatus[d.id]) hiPri.push({t:d.task, c:`Day ${d.day}`});
             });
 
-            const getPct = (n,d) => d ? Math.round((n/d)*100) : 0;
             const dsaDone = Object.keys(window.state.dsaStatus||{}).length;
             const dsaTotal = (window.state.dsa||[]).length || 1;
             
-            // Update Donuts
             updateDonut('kpi-overall', getPct(totalD, totalT), '#3b82f6', '%');
-            updateDonut('kpi-dsa', Math.round((dsaDone/dsaTotal)*100), '#10b981', dsaDone);
+            updateDonut('kpi-dsa', Math.round((dsaDone/dsaTotal)*100), '#10b981', dsaDone + '/90');
             updateDonut('kpi-client', getPct(clientD, clientT), '#6366f1', '%');
             updateDonut('kpi-epam', getPct(epamD, epamT), '#ec4899', '%');
             updateDonut('kpi-cert', getPct(learnD, learnT), '#8b5cf6', '%');
-            
-            // Streak
             const streak = Object.keys(window.state.healthHistory||{}).length;
-            updateDonut('kpi-streak', Math.min(streak*10, 100), '#f59e0b', streak); // Visual cap at 10 days for full circle
+            updateDonut('kpi-streak', Math.min(streak*10, 100), '#f59e0b', streak + 'd');
 
-            // Focus List
             const fl = document.getElementById('focus-list');
-            if(hiPri.length===0) fl.innerHTML=`<div class="text-slate-400 text-xs italic p-2">No high priority tasks.</div>`;
-            else fl.innerHTML = hiPri.map(h=>`<div class="flex justify-between items-center bg-orange-50 p-2.5 rounded-lg border-l-2 border-orange-500 mb-2"><div class="truncate mr-2"><div class="font-bold text-sm text-slate-800 truncate">${h.t}</div><div class="text-[10px] text-slate-500 uppercase tracking-wide">${h.c}</div></div><span class="text-[10px] font-bold bg-white px-2 py-1 rounded text-orange-600 shadow-sm">HIGH</span></div>`).join('');
+            if(hiPri.length===0) fl.innerHTML=`<div class="flex flex-col items-center justify-center h-full text-slate-400 text-xs italic p-4 gap-2"><i class="ph-duotone ph-check-circle text-2xl"></i>All caught up!</div>`;
+            else fl.innerHTML = hiPri.map(h=>`<div class="flex justify-between items-center bg-orange-50 p-3 rounded-lg border-l-[3px] border-orange-500 mb-2 shadow-sm"><div class="truncate mr-2"><div class="font-bold text-sm text-slate-800 truncate">${h.t}</div><div class="text-[10px] text-slate-500 uppercase tracking-wide font-bold">${h.c}</div></div><i class="ph-fill ph-warning-circle text-orange-500"></i></div>`).join('');
         }
 
         function updateDonut(id, pct, color, labelType) {
@@ -358,9 +206,7 @@
         }
 
         function renderDSA() {
-            const container = document.getElementById('dsa-list-container');
-            container.innerHTML = '';
-            // Group By Day
+            const container = document.getElementById('dsa-list-container'); container.innerHTML = '';
             const sorted = [...(window.state.dsa||[])].sort((a,b)=>a.day - b.day);
             const grouped = sorted.reduce((acc,curr)=>{acc[curr.day]=acc[curr.day]||[];acc[curr.day].push(curr);return acc;},{});
             
@@ -368,26 +214,27 @@
                 const items = grouped[day];
                 const allDone = items.every(i => window.state.dsaStatus[i.id]);
                 const card = document.createElement('div');
-                card.className = `card overflow-hidden ${allDone ? 'opacity-60 grayscale' : ''}`;
-                let html = `<div class="bg-slate-50 px-4 py-2 border-b border-slate-100 flex justify-between items-center"><span class="font-bold text-xs text-slate-500 uppercase">Day ${day}</span><span class="text-[10px] bg-white px-2 py-0.5 rounded border border-slate-200">${items[0].topic}</span></div>`;
-                html += `<div class="divide-y divide-slate-100">`;
+                card.className = `card ${allDone ? 'bg-slate-50' : ''}`;
+                let html = `<div class="bg-slate-100/50 px-4 py-2 border-b border-slate-100 flex justify-between items-center"><span class="font-bold text-xs text-slate-500 uppercase">Day ${day}</span><span class="text-[10px] bg-white px-2 py-0.5 rounded border border-slate-200 text-slate-600 font-bold shadow-sm">${items[0].topic}</span></div>`;
+                html += `<div class="divide-y divide-slate-50">`;
                 items.forEach(i => {
                     const done = window.state.dsaStatus[i.id];
-                    html += `<div class="p-3 flex items-center gap-3">
-                        <input type="checkbox" class="w-5 h-5 rounded border-slate-300 text-emerald-600 focus:ring-emerald-500" ${done?'checked':''} onchange="toggleDSA(${i.id})">
+                    html += `<div class="p-4 flex items-center gap-3 ${done?'opacity-50 grayscale':''}">
+                        <input type="checkbox" class="w-5 h-5 rounded border-slate-300 text-emerald-600 focus:ring-emerald-500 transition" ${done?'checked':''} onchange="toggleDSA(${i.id})">
                         <div class="flex-1 min-w-0">
-                            <a href="${i.link}" target="_blank" class="text-sm font-semibold text-slate-700 hover:text-blue-600 truncate block">${i.task}</a>
-                            <div class="flex items-center gap-2 mt-0.5">
-                                <span class="text-[10px] px-1.5 py-0.5 rounded ${i.pri==='High'?'bg-red-100 text-red-700':i.pri==='Medium'?'bg-yellow-100 text-yellow-700':'bg-slate-100 text-slate-500'} font-bold">${i.pri}</span>
+                            <a href="${i.link}" target="_blank" class="text-sm font-bold text-slate-700 hover:text-blue-600 truncate block">${i.task}</a>
+                            <div class="flex items-center gap-2 mt-1">
+                                <span class="text-[10px] px-2 py-0.5 rounded-full ${i.pri==='High'?'bg-red-100 text-red-700':i.pri==='Medium'?'bg-yellow-100 text-yellow-700':'bg-slate-100 text-slate-500'} font-bold">${i.pri}</span>
                             </div>
                         </div>
-                        <button onclick="openEditDSAModal(${i.id})" class="text-slate-300 hover:text-blue-500 p-2"><i class="ph-bold ph-pencil-simple"></i></button>
+                        <button onclick="openEditDSAModal(${i.id})" class="w-8 h-8 flex items-center justify-center rounded-full bg-slate-50 text-slate-400 hover:bg-white hover:shadow-sm transition"><i class="ph-bold ph-pencil-simple"></i></button>
                     </div>`;
                 });
                 html += `</div>`;
                 card.innerHTML = html;
                 container.appendChild(card);
             });
+            document.getElementById('dsa-progress-text').innerText = `${Object.keys(window.state.dsaStatus||{}).length} / ${(window.state.dsa||[]).length} Solved`;
         }
 
         function renderProjects(type) {
@@ -399,25 +246,23 @@
                 const total=p.subtasks.length, sum=p.subtasks.reduce((a,b)=>a+parseInt(b.progress),0); const pct = total?Math.round(sum/total):0;
                 return `<div class="card p-4 relative border-l-4 border-${color}-500">
                     <div class="flex justify-between items-start mb-3">
-                        <div><h3 class="font-bold text-slate-800">${p.title}</h3><div class="text-xs text-slate-400 font-medium mt-0.5">${total} Tasks</div></div>
-                        <div class="flex flex-col items-end gap-1">
-                            <span class="text-xl font-bold text-${color}-600">${pct}%</span>
-                            <button onclick="deleteProject(${p.id})" class="text-slate-300 hover:text-red-500"><i class="ph-bold ph-trash"></i></button>
+                        <div><h3 class="font-bold text-slate-800 text-lg">${p.title}</h3><div class="text-xs text-slate-400 font-bold mt-0.5">${total} Tasks</div></div>
+                        <div class="text-right">
+                            <span class="text-2xl font-bold text-${color}-600 block">${pct}%</span>
+                            <button onclick="deleteProject(${p.id})" class="text-slate-300 hover:text-red-500 text-xs mt-1"><i class="ph-bold ph-trash"></i></button>
                         </div>
                     </div>
-                    <div class="w-full bg-slate-100 rounded-full h-1.5 mb-4"><div class="bg-${color}-500 h-1.5 rounded-full transition-all" style="width:${pct}%"></div></div>
-                    <div class="space-y-3">${p.subtasks.map((s, idx) => `
-                        <div class="flex items-center gap-3">
-                            <div class="flex-1">
-                                <div class="flex justify-between text-xs mb-1.5">
-                                    <span class="font-semibold text-slate-700 truncate w-32">${s.title}</span>
-                                    <span class="font-mono text-slate-400">${s.progress}%</span>
-                                </div>
-                                <input type="range" class="w-full h-1.5 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-${color}-600" min="0" max="100" value="${s.progress}" onchange="updateSubtask(${p.id}, ${idx}, this.value)">
+                    <div class="w-full bg-slate-100 rounded-full h-1.5 mb-4 overflow-hidden"><div class="bg-${color}-500 h-1.5 rounded-full transition-all duration-500" style="width:${pct}%"></div></div>
+                    <div class="space-y-4">${p.subtasks.map((s, idx) => `
+                        <div class="group">
+                            <div class="flex justify-between text-xs mb-2 font-semibold text-slate-700">
+                                <span>${s.title}</span>
+                                <span class="text-${color}-600">${s.progress}%</span>
                             </div>
+                            <input type="range" class="w-full h-2 bg-slate-100 rounded-lg appearance-none cursor-pointer accent-${color}-600 hover:bg-slate-200 transition" min="0" max="100" value="${s.progress}" onchange="updateSubtask(${p.id}, ${idx}, this.value)">
                         </div>`).join('')}
                     </div>
-                    <button onclick="openSubtaskModal(${p.id})" class="mt-4 w-full py-2.5 border border-dashed border-slate-300 text-slate-500 rounded-lg text-xs font-bold uppercase tracking-wide hover:bg-slate-50">+ Add Task</button>
+                    <button onclick="openSubtaskModal(${p.id})" class="mt-6 w-full py-2.5 border border-dashed border-slate-300 text-slate-500 rounded-lg text-xs font-bold uppercase tracking-wider hover:bg-slate-50 hover:border-slate-400 transition">+ Add Task</button>
                 </div>`;
             }).join('');
         }
@@ -446,173 +291,124 @@
             let w=0, l=0, e=0;
             (window.state.projects||[]).forEach(p => { const s=p.subtasks.reduce((a,b)=>a+parseInt(b.progress),0); const m=p.subtasks.length*100||1; const sc=(s/m)*100; if(p.type==='Work') w+=sc; else if(p.type==='Epam') e+=sc; else l+=sc; });
             const d = (Object.keys(window.state.dsaStatus||{}).length/90)*100;
-            window.myChart = new Chart(ctx, { type: 'doughnut', data: { labels: ['Work', 'Epam', 'Learn', 'DSA'], datasets: [{ data: [w||1, e||1, l||1, d||1], backgroundColor: ['#3b82f6', '#ec4899', '#8b5cf6', '#10b981'], borderWidth:0 }] }, options: { maintainAspectRatio:false, plugins:{legend:{position:'right', labels:{boxWidth:10, font:{size:10}}}} } });
+            window.myChart = new Chart(ctx, { 
+                type: 'doughnut', 
+                data: { labels: ['Work', 'Epam', 'Learn', 'DSA'], datasets: [{ data: [w||1, e||1, l||1, d||1], backgroundColor: ['#3b82f6', '#ec4899', '#8b5cf6', '#10b981'], borderWidth:0 }] }, 
+                options: { 
+                    responsive: true, 
+                    maintainAspectRatio: false, 
+                    layout: { padding: 20 },
+                    plugins:{ 
+                        legend:{ position:'bottom', labels:{ usePointStyle:true, padding: 20, font:{family:'Inter', size:11} } } 
+                    },
+                    cutout: '70%'
+                } 
+            });
         }
 
-        // --- ACTIONS & MODALS ---
-        // (Simplified Modal Logic for Mobile)
-        function showModal(html) {
-            const w = document.getElementById('modal-wrapper');
-            const c = document.getElementById('modal-content');
-            c.innerHTML = html;
-            w.classList.remove('hidden');
+        // --- GLOBAL ACTIONS ---
+        window.render = function() {
+            renderKPIs();
+            renderProjects('Work'); renderProjects('Epam'); renderProjects('Learning');
+            renderDSA(); renderHealth();
+            updateCharts();
+            document.getElementById('current-date').innerText = new Date().toLocaleDateString('en-IN', {weekday:'long', day:'numeric', month:'long'});
         }
+
+        function showModal(html) { const w=document.getElementById('modal-wrapper'); document.getElementById('modal-content').innerHTML=html; w.classList.remove('hidden'); }
         window.closeModal = () => document.getElementById('modal-wrapper').classList.add('hidden');
 
-        // ACTIONS
-        window.openAddDSAModal = () => showModal(`
-            <h3 class="text-lg font-bold mb-4">Add Problem</h3>
-            <input type="number" id="inp-day" class="w-full border p-3 rounded-lg mb-3 text-sm" placeholder="Day (e.g. 5)">
-            <input type="text" id="inp-topic" class="w-full border p-3 rounded-lg mb-3 text-sm" placeholder="Topic">
-            <input type="text" id="inp-task" class="w-full border p-3 rounded-lg mb-3 text-sm" placeholder="Problem Name">
-            <input type="text" id="inp-link" class="w-full border p-3 rounded-lg mb-3 text-sm" placeholder="URL">
-            <select id="inp-pri" class="w-full border p-3 rounded-lg mb-4 text-sm bg-white"><option>Low</option><option>Medium</option><option>High</option></select>
-            <button onclick="commitDSA(null)" class="w-full bg-emerald-600 text-white py-3 rounded-lg font-bold">Add Task</button>
-        `);
-
-        window.openEditDSAModal = (id) => {
-            const item = window.state.dsa.find(i=>i.id===id);
-            showModal(`
-                <h3 class="text-lg font-bold mb-4">Edit Problem</h3>
-                <input type="number" id="inp-day" class="w-full border p-3 rounded-lg mb-3 text-sm" value="${item.day}">
-                <input type="text" id="inp-topic" class="w-full border p-3 rounded-lg mb-3 text-sm" value="${item.topic}">
-                <input type="text" id="inp-task" class="w-full border p-3 rounded-lg mb-3 text-sm" value="${item.task}">
-                <input type="text" id="inp-link" class="w-full border p-3 rounded-lg mb-3 text-sm" value="${item.link}">
-                <select id="inp-pri" class="w-full border p-3 rounded-lg mb-4 text-sm bg-white"><option ${item.pri==='Low'?'selected':''}>Low</option><option ${item.pri==='Medium'?'selected':''}>Medium</option><option ${item.pri==='High'?'selected':''}>High</option></select>
-                <div class="flex gap-2">
-                    <button onclick="commitDSA(${id})" class="flex-1 bg-emerald-600 text-white py-3 rounded-lg font-bold">Save</button>
-                    <button onclick="deleteDSA(${id})" class="px-4 text-red-500 font-bold">Delete</button>
-                </div>
-            `);
-        };
-
-        window.commitDSA = (id) => {
-            const day = parseInt(document.getElementById('inp-day').value);
-            const task = document.getElementById('inp-task').value;
-            if(!day || !task) return;
-            const obj = {
-                day, task,
-                topic: document.getElementById('inp-topic').value,
-                link: document.getElementById('inp-link').value,
-                pri: document.getElementById('inp-pri').value
-            };
-            if(id) {
-                const idx = window.state.dsa.findIndex(i=>i.id===id);
-                if(idx!==-1) window.state.dsa[idx] = {...window.state.dsa[idx], ...obj};
-            } else {
-                window.state.dsa.push({id:Date.now(), ...obj});
-            }
-            window.saveToCloud(); window.render(); window.closeModal();
-        };
-
-        window.deleteDSA = (id) => {
-            if(confirm('Delete?')) { window.state.dsa = window.state.dsa.filter(i=>i.id!==id); window.saveToCloud(); window.render(); window.closeModal(); }
-        }
-
-        window.openProjectModal = (type) => showModal(`
-            <h3 class="text-lg font-bold mb-4">New Project (${type})</h3>
-            <input type="text" id="inp-ptitle" class="w-full border p-3 rounded-lg mb-4 text-sm" placeholder="Project Title">
-            <button onclick="commitProject('${type}')" class="w-full bg-blue-600 text-white py-3 rounded-lg font-bold">Create Project</button>
-        `);
-
-        window.commitProject = (type) => {
-            const t = document.getElementById('inp-ptitle').value;
-            if(t) { window.state.projects.push({id:Date.now(), title:t, type, subtasks:[]}); window.saveToCloud(); window.render(); window.closeModal(); }
-        };
-
-        window.openSubtaskModal = (pid) => showModal(`
-            <h3 class="text-lg font-bold mb-4">Add Task</h3>
-            <input type="text" id="inp-stitle" class="w-full border p-3 rounded-lg mb-3 text-sm" placeholder="Task Name">
-            <select id="inp-spri" class="w-full border p-3 rounded-lg mb-4 text-sm bg-white"><option>Low</option><option>Medium</option><option>High</option></select>
-            <button onclick="commitSubtask(${pid})" class="w-full bg-blue-600 text-white py-3 rounded-lg font-bold">Add Task</button>
-        `);
-
-        window.commitSubtask = (pid) => {
-            const t = document.getElementById('inp-stitle').value;
-            const p = document.getElementById('inp-spri').value;
-            if(t) { 
-                window.state.projects.find(x=>x.id===pid).subtasks.push({title:t, priority:p, progress:0}); 
-                window.saveToCloud(); window.render(); window.closeModal(); 
-            }
-        };
-
-        window.openRoutineModal = () => {
-            const items = window.state.routine.map((r,i) => `
-                <div class="flex gap-2 mb-2">
-                    <input class="w-20 border p-2 rounded text-sm r-time" type="time" value="${r.time}">
-                    <input class="flex-1 border p-2 rounded text-sm r-text" type="text" value="${r.text}">
-                </div>
-            `).join('');
-            showModal(`
-                <h3 class="text-lg font-bold mb-4">Edit Routine</h3>
-                <div id="r-list" class="max-h-60 overflow-y-auto mb-4">${items}</div>
-                <div class="flex gap-2">
-                    <button onclick="addRoutineRow()" class="px-4 py-2 border rounded-lg text-sm">+ Add</button>
-                    <button onclick="commitRoutine()" class="flex-1 bg-slate-800 text-white rounded-lg text-sm font-bold">Save</button>
-                </div>
-            `);
-        };
-
-        window.addRoutineRow = () => {
-            const d = document.createElement('div'); d.className='flex gap-2 mb-2';
-            d.innerHTML = `<input class="w-20 border p-2 rounded text-sm r-time" type="time"><input class="flex-1 border p-2 rounded text-sm r-text" type="text">`;
-            document.getElementById('r-list').appendChild(d);
-        };
-
-        window.commitRoutine = () => {
-            const newR = [];
-            document.querySelectorAll('#r-list > div').forEach((d,i) => {
-                const time = d.querySelector('.r-time').value;
-                const text = d.querySelector('.r-text').value;
-                if(text) newR.push({id:i+1, time, text});
-            });
-            window.state.routine = newR;
-            window.saveToCloud(); window.render(); window.closeModal();
-        };
-
-        // Router
-        window.router = (view) => {
-            document.querySelectorAll('[id^="view-"]').forEach(e => e.classList.add('hidden'));
-            document.getElementById(`view-${view}`).classList.remove('hidden');
-            // Update Mobile Nav
-            document.querySelectorAll('.mobile-nav-item').forEach(e => e.classList.remove('active', 'text-blue-600'));
-            const mNav = document.getElementById(`m-nav-${view}`);
-            if(mNav) mNav.classList.add('active', 'text-blue-600');
-            // Update Desktop Nav
-            document.querySelectorAll('.sidebar-item').forEach(e => e.classList.remove('active', 'bg-blue-50', 'text-blue-600'));
-            const dNav = document.getElementById(`d-nav-${view}`);
-            if(dNav) dNav.classList.add('active', 'bg-blue-50', 'text-blue-600');
-            
-            if(view === 'dashboard') updateCharts();
-        };
-
-        // Actions Wrappers
-        window.toggleHealthItem = (id) => {
-            if(window.state.todayHealth.includes(id)) window.state.todayHealth = window.state.todayHealth.filter(i=>i!==id);
-            else window.state.todayHealth.push(id);
-            window.saveToCloud(); window.render();
-        };
-        window.saveHealthDay = () => {
-            const date = new Date().toISOString().split('T')[0];
-            window.state.healthHistory[date] = [...window.state.todayHealth];
-            window.saveToCloud(); alert("Day Saved!"); window.render();
-        };
-        window.toggleDSA = (id) => {
-            if(window.state.dsaStatus[id]) delete window.state.dsaStatus[id]; else window.state.dsaStatus[id] = true;
-            window.saveToCloud(); window.render();
-        };
-        window.updateSubtask = (pid, idx, val) => {
-            window.state.projects.find(x=>x.id===pid).subtasks[idx].progress = val;
-            window.saveToCloud(); window.render();
-        };
-        window.deleteProject = (id) => {
-            if(confirm('Delete Project?')) { window.state.projects = window.state.projects.filter(p=>p.id!==id); window.saveToCloud(); window.render(); }
-        };
+        window.openAddDSAModal = () => showModal(`<h3 class="text-lg font-bold mb-4">Add Problem</h3><input type="number" id="inp-day" class="w-full border p-3 rounded-lg mb-3 text-sm" placeholder="Day (e.g. 5)"><input type="text" id="inp-topic" class="w-full border p-3 rounded-lg mb-3 text-sm" placeholder="Topic"><input type="text" id="inp-task" class="w-full border p-3 rounded-lg mb-3 text-sm" placeholder="Problem Name"><input type="text" id="inp-link" class="w-full border p-3 rounded-lg mb-3 text-sm" placeholder="URL"><select id="inp-pri" class="w-full border p-3 rounded-lg mb-4 text-sm bg-white"><option>Low</option><option>Medium</option><option>High</option></select><button onclick="commitDSA(null)" class="w-full bg-emerald-600 text-white py-3 rounded-lg font-bold">Add Task</button>`);
+        window.openEditDSAModal = (id) => { const item = window.state.dsa.find(i=>i.id===id); showModal(`<h3 class="text-lg font-bold mb-4">Edit Problem</h3><input type="number" id="inp-day" class="w-full border p-3 rounded-lg mb-3 text-sm" value="${item.day}"><input type="text" id="inp-topic" class="w-full border p-3 rounded-lg mb-3 text-sm" value="${item.topic}"><input type="text" id="inp-task" class="w-full border p-3 rounded-lg mb-3 text-sm" value="${item.task}"><input type="text" id="inp-link" class="w-full border p-3 rounded-lg mb-3 text-sm" value="${item.link}"><select id="inp-pri" class="w-full border p-3 rounded-lg mb-4 text-sm bg-white"><option ${item.pri==='Low'?'selected':''}>Low</option><option ${item.pri==='Medium'?'selected':''}>Medium</option><option ${item.pri==='High'?'selected':''}>High</option></select><div class="flex gap-2"><button onclick="commitDSA(${id})" class="flex-1 bg-emerald-600 text-white py-3 rounded-lg font-bold">Save</button><button onclick="deleteDSA(${id})" class="px-4 text-red-500 font-bold">Delete</button></div>`); };
+        window.commitDSA = (id) => { const day=parseInt(document.getElementById('inp-day').value); const task=document.getElementById('inp-task').value; if(!day||!task) return; const obj={day, task, topic:document.getElementById('inp-topic').value, link:document.getElementById('inp-link').value, pri:document.getElementById('inp-pri').value}; if(id) { const idx=window.state.dsa.findIndex(i=>i.id===id); if(idx!==-1) window.state.dsa[idx]={...window.state.dsa[idx], ...obj}; } else { window.state.dsa.push({id:Date.now(), ...obj}); } window.saveToCloud(); window.render(); window.closeModal(); };
+        window.deleteDSA = (id) => { if(confirm('Delete?')) { window.state.dsa = window.state.dsa.filter(i=>i.id!==id); window.saveToCloud(); window.render(); window.closeModal(); } }
+        window.openProjectModal = (type) => showModal(`<h3 class="text-lg font-bold mb-4">New Project (${type})</h3><input type="text" id="inp-ptitle" class="w-full border p-3 rounded-lg mb-4 text-sm" placeholder="Project Title"><button onclick="commitProject('${type}')" class="w-full bg-blue-600 text-white py-3 rounded-lg font-bold">Create Project</button>`);
+        window.commitProject = (type) => { const t = document.getElementById('inp-ptitle').value; if(t) { window.state.projects.push({id:Date.now(), title:t, type, subtasks:[]}); window.saveToCloud(); window.render(); window.closeModal(); } };
+        window.openSubtaskModal = (pid) => showModal(`<h3 class="text-lg font-bold mb-4">Add Task</h3><input type="text" id="inp-stitle" class="w-full border p-3 rounded-lg mb-3 text-sm" placeholder="Task Name"><select id="inp-spri" class="w-full border p-3 rounded-lg mb-4 text-sm bg-white"><option>Low</option><option>Medium</option><option>High</option></select><button onclick="commitSubtask(${pid})" class="w-full bg-blue-600 text-white py-3 rounded-lg font-bold">Add Task</button>`);
+        window.commitSubtask = (pid) => { const t = document.getElementById('inp-stitle').value; const p = document.getElementById('inp-spri').value; if(t) { window.state.projects.find(x=>x.id===pid).subtasks.push({title:t, priority:p, progress:0}); window.saveToCloud(); window.render(); window.closeModal(); } };
+        window.openRoutineModal = () => { const items = window.state.routine.map((r,i) => `<div class="flex gap-2 mb-2"><input class="w-20 border p-2 rounded text-sm r-time" type="time" value="${r.time}"><input class="flex-1 border p-2 rounded text-sm r-text" type="text" value="${r.text}"></div>`).join(''); showModal(`<h3 class="text-lg font-bold mb-4">Edit Routine</h3><div id="r-list" class="max-h-60 overflow-y-auto mb-4">${items}</div><div class="flex gap-2"><button onclick="addRoutineRow()" class="px-4 py-2 border rounded-lg text-sm">+ Add</button><button onclick="commitRoutine()" class="flex-1 bg-slate-800 text-white rounded-lg text-sm font-bold">Save</button></div>`); };
+        window.addRoutineRow = () => { const d = document.createElement('div'); d.className='flex gap-2 mb-2'; d.innerHTML = `<input class="w-20 border p-2 rounded text-sm r-time" type="time"><input class="flex-1 border p-2 rounded text-sm r-text" type="text">`; document.getElementById('r-list').appendChild(d); };
+        window.commitRoutine = () => { const newR = []; document.querySelectorAll('#r-list > div').forEach((d,i) => { const time = d.querySelector('.r-time').value; const text = d.querySelector('.r-text').value; if(text) newR.push({id:i+1, time, text}); }); window.state.routine = newR; window.saveToCloud(); window.render(); window.closeModal(); };
+        window.toggleHealthItem = (id) => { if(window.state.todayHealth.includes(id)) window.state.todayHealth = window.state.todayHealth.filter(i=>i!==id); else window.state.todayHealth.push(id); window.saveToCloud(); window.render(); };
+        window.saveHealthDay = () => { const date = new Date().toISOString().split('T')[0]; window.state.healthHistory[date] = [...window.state.todayHealth]; window.saveToCloud(); alert("Day Saved!"); window.render(); };
+        window.toggleDSA = (id) => { if(window.state.dsaStatus[id]) delete window.state.dsaStatus[id]; else window.state.dsaStatus[id] = true; window.saveToCloud(); window.render(); };
+        window.updateSubtask = (pid, idx, val) => { window.state.projects.find(x=>x.id===pid).subtasks[idx].progress = val; window.saveToCloud(); window.render(); };
+        window.deleteProject = (id) => { if(confirm('Delete Project?')) { window.state.projects = window.state.projects.filter(p=>p.id!==id); window.saveToCloud(); window.render(); } };
         window.exportData = () => { const d = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(window.state)); const a = document.createElement('a'); a.href = d; a.download = "sdet_backup.json"; a.click(); };
         window.resetApp = () => { if(confirm("Reset Everything?")) { window.state = {projects:[], dsa:[], dsaStatus:{}, routine:[], healthHistory:{}, todayHealth:[]}; window.saveToCloud(); location.reload(); }};
 
-        // Initial Load (if offline)
-        if(!db) window.render(); window.router('dashboard');
+        window.router = (view) => {
+            document.querySelectorAll('[id^="view-"]').forEach(e => e.classList.add('hidden'));
+            document.getElementById(`view-${view}`).classList.remove('hidden');
+            document.querySelectorAll('.mobile-nav-item').forEach(e => e.classList.remove('active', 'text-blue-600'));
+            const mNav = document.getElementById(`m-nav-${view}`); if(mNav) mNav.classList.add('active', 'text-blue-600');
+            document.querySelectorAll('.sidebar-item').forEach(e => e.classList.remove('active', 'bg-blue-50', 'text-blue-600'));
+            const dNav = document.getElementById(`d-nav-${view}`); if(dNav) dNav.classList.add('active', 'bg-blue-50', 'text-blue-600');
+            if(view === 'dashboard') updateCharts();
+        };
+
+        // --- FIREBASE INIT ---
+        let app, db, firebaseActive = false;
+        try {
+            const mod = await import("https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js");
+            const dbMod = await import("https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js");
+            
+            app = mod.initializeApp({
+                apiKey: "AIzaSyDSeqlg_QIEzHx2n15GcOP5jgKZzQ_MzZg",
+                authDomain: "sdet-dashboard.firebaseapp.com",
+                databaseURL: "https://sdet-dashboard-default-rtdb.firebaseio.com",
+                projectId: "sdet-dashboard",
+                storageBucket: "sdet-dashboard.firebasestorage.app",
+                messagingSenderId: "917849703698",
+                appId: "1:917849703698:web:764162e0198e5cf9439fcb"
+            });
+            db = dbMod.getDatabase(app);
+            firebaseActive = true;
+            
+            window.saveToCloud = function() {
+                if(firebaseActive && db && window.state) {
+                    document.getElementById('loading-spinner').classList.remove('hidden');
+                    dbMod.set(dbMod.ref(db, 'sdet_dashboard'), JSON.parse(JSON.stringify(window.state)))
+                        .then(() => document.getElementById('loading-spinner').classList.add('hidden'))
+                        .catch(() => document.getElementById('loading-spinner').classList.add('hidden'));
+                }
+            }
+
+            dbMod.onValue(dbMod.ref(db, 'sdet_dashboard'), (snapshot) => {
+                const data = snapshot.val();
+                if(data) {
+                    window.state = data;
+                    if (!window.state.projects) window.state.projects = [];
+                    if (!window.state.dsa) window.state.dsa = [];
+                    if (!window.state.dsaStatus) window.state.dsaStatus = {};
+                    if (!window.state.routine) window.state.routine = [];
+                    if (!window.state.healthHistory) window.state.healthHistory = {};
+                    if (!window.state.todayHealth) window.state.todayHealth = [];
+                    window.render();
+                    updateSyncStatus(true);
+                } else {
+                    window.saveToCloud();
+                }
+            }, () => updateSyncStatus(false));
+
+        } catch(e) { updateSyncStatus(false); }
+
+        function updateSyncStatus(connected) {
+            const icon = document.getElementById('sync-status-icon');
+            const text = document.getElementById('sync-status-text');
+            if(icon && text) {
+                if(connected) {
+                    icon.className = "w-2 h-2 rounded-full bg-emerald-500 animate-pulse";
+                    text.innerText = "Synced";
+                } else {
+                    icon.className = "w-2 h-2 rounded-full bg-slate-400";
+                    text.innerText = "Offline";
+                }
+            }
+        }
+
+        // Init Router
+        window.router('dashboard');
     </script>
 </body>
 </html>
