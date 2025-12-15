@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>SDET Mastery | v20</title>
+    <title>Planner</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
@@ -18,17 +18,27 @@
             -webkit-tap-highlight-color: transparent; 
         }
         
-        .no-scrollbar::-webkit-scrollbar { display: none; }
-        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        /* SCROLLBAR */
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
 
         .card { 
             background: white; 
             border-radius: 1rem; 
             box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05), 0 1px 2px -1px rgba(0, 0, 0, 0.01);
             border: 1px solid #f1f5f9;
+            transition: all 0.3s ease;
         }
 
-        /* Donut Chart */
+        /* Highlight Logic for DSA */
+        .card-highlight {
+            border-color: #3b82f6 !important;
+            box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.15), 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            transform: scale(1.01);
+        }
+
         .donut-ring {
             width: 56px; height: 56px;
             border-radius: 50%;
@@ -44,7 +54,6 @@
         }
         .donut-text { position: relative; font-size: 0.7rem; font-weight: 800; color: #334155; }
 
-        /* Sidebar */
         .sidebar-item { 
             display: flex; align-items: center; 
             padding: 12px; border-radius: 12px; 
@@ -66,31 +75,15 @@
         .loader { border: 3px solid #e2e8f0; border-top: 3px solid #3b82f6; border-radius: 50%; width: 20px; height: 20px; animation: spin 1s linear infinite; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
-        /* Custom Checkbox */
         .custom-checkbox {
-            appearance: none;
-            background-color: #fff;
-            margin: 0;
-            font: inherit;
-            color: currentColor;
-            width: 1.15em;
-            height: 1.15em;
-            border: 0.15em solid #cbd5e1;
-            border-radius: 0.15em;
-            display: grid;
-            place-content: center;
-            cursor: pointer;
-            transition: all 0.2s;
+            appearance: none; background-color: #fff; margin: 0; font: inherit; color: currentColor;
+            width: 1.15em; height: 1.15em; border: 0.15em solid #cbd5e1; border-radius: 0.15em;
+            display: grid; place-content: center; cursor: pointer; transition: all 0.2s;
         }
         .custom-checkbox::before {
-            content: "";
-            width: 0.65em;
-            height: 0.65em;
-            transform: scale(0);
-            transition: 120ms transform ease-in-out;
-            box-shadow: inset 1em 1em white;
-            background-color: CanvasText;
-            transform-origin: center;
+            content: ""; width: 0.65em; height: 0.65em; transform: scale(0);
+            transition: 120ms transform ease-in-out; box-shadow: inset 1em 1em white;
+            background-color: CanvasText; transform-origin: center;
             clip-path: polygon(14% 44%, 0 65%, 50% 100%, 100% 16%, 80% 0%, 43% 62%);
         }
         .custom-checkbox:checked { background-color: #10b981; border-color: #10b981; }
@@ -104,8 +97,8 @@
             <div class="h-20 flex items-center px-5 gap-3 transition-all duration-300">
                 <div class="w-10 h-10 min-w-[2.5rem] bg-blue-600 rounded-xl flex items-center justify-center text-white shadow-blue-200 shadow-lg"><i class="ph-bold ph-rocket-launch text-xl"></i></div>
                 <div class="nav-text whitespace-nowrap">
-                    <h1 class="font-bold text-lg leading-tight text-slate-900">SDET Plan</h1>
-                    <p class="text-xs text-slate-400 font-medium">Mastery Edition</p>
+                    <h1 class="font-bold text-lg leading-tight text-slate-900">Planner</h1>
+                    <p class="text-xs text-slate-400 font-medium">SDET Edition</p>
                 </div>
             </div>
             
@@ -124,18 +117,27 @@
                 <div id="sync-status-icon" class="w-2.5 h-2.5 rounded-full bg-red-500 shrink-0"></div>
                 <span id="sync-status-text" class="nav-text text-xs font-semibold text-slate-400">Connecting...</span>
             </div>
-            <button onclick="exportData()" class="mt-3 w-full h-10 flex items-center justify-center bg-white border border-slate-200 rounded-lg hover:bg-slate-50 text-slate-600 transition shadow-sm">
-                <i class="ph-bold ph-download-simple text-lg"></i>
-                <span class="nav-text ml-2 text-xs font-bold">Backup</span>
-            </button>
-            <button onclick="resetApp()" class="mt-2 w-full h-8 flex items-center justify-center bg-red-50 text-red-500 hover:bg-red-100 rounded-lg transition text-xs font-bold">
+            
+            <div class="grid grid-cols-2 gap-2 mt-3">
+                <button onclick="exportData()" class="h-9 flex items-center justify-center bg-white border border-slate-200 rounded-lg hover:bg-slate-50 text-slate-600 transition shadow-sm" title="Backup">
+                    <i class="ph-bold ph-download-simple"></i>
+                    <span class="nav-text ml-2 text-xs font-bold">Backup</span>
+                </button>
+                <button onclick="document.getElementById('import-file').click()" class="h-9 flex items-center justify-center bg-white border border-slate-200 rounded-lg hover:bg-slate-50 text-slate-600 transition shadow-sm" title="Restore">
+                    <i class="ph-bold ph-upload-simple"></i>
+                    <span class="nav-text ml-2 text-xs font-bold">Restore</span>
+                </button>
+                <input type="file" id="import-file" class="hidden" accept=".json" onchange="importData(this)">
+            </div>
+
+            <button onclick="resetApp()" class="mt-2 w-full h-8 flex items-center justify-center bg-red-50 text-red-500 hover:bg-red-100 rounded-lg transition text-xs font-bold" title="Reset All">
                 <i class="ph-bold ph-trash"></i>
                 <span class="nav-text ml-2">Clear Data</span>
             </button>
         </div>
     </aside>
 
-    <main class="flex-1 md:ml-20 overflow-y-auto no-scrollbar relative bg-slate-50 pb-32 md:pb-8 transition-all duration-300">
+    <main class="flex-1 md:ml-20 overflow-y-auto relative bg-slate-50 pb-32 md:pb-8 transition-all duration-300">
         
         <header class="sticky top-0 z-20 bg-white/80 backdrop-blur-md border-b border-slate-200 px-6 py-4 flex justify-between items-center shadow-sm">
             <div>
@@ -182,14 +184,10 @@
                             <div class="text-xs text-slate-400 font-bold uppercase">Progress</div>
                             <div class="text-lg font-bold text-emerald-600" id="dsa-total-progress">0%</div>
                         </div>
-                        <div class="w-12 h-12">
-                            <canvas id="dsa-mini-chart"></canvas>
-                        </div>
+                        <div class="w-12 h-12"><canvas id="dsa-mini-chart"></canvas></div>
                     </div>
                 </div>
-
-                <div id="dsa-cards-container" class="grid grid-cols-1 xl:grid-cols-2 gap-6">
-                    </div>
+                <div id="dsa-cards-container" class="grid grid-cols-1 xl:grid-cols-2 gap-6"></div>
             </div>
 
             <div id="view-projects" class="hidden space-y-4">
@@ -238,7 +236,7 @@
     <script>
         // --- 1. CONFIGURATION DATA (The 20 Parts) ---
         const dsaCurriculum = [
-            {
+              {
     "id": 1,
     "title": "Part 1: Python Memory Model & Variables",
     "topics": "Dynamic Typing, Object Interning, Mutability vs Immutability, 'is' vs '=='",
@@ -1354,7 +1352,6 @@
                 if(data) {
                     window.state = data;
                     if (!window.state.projects) window.state.projects = [];
-                    // dsaStatus now tracks { "problemId": true/false }
                     if (!window.state.dsaStatus) window.state.dsaStatus = {};
                     if (!window.state.routine) window.state.routine = [];
                     if (!window.state.healthHistory) window.state.healthHistory = {};
@@ -1397,7 +1394,7 @@
         // STATE
         window.state = {
             projects: [],
-            dsaStatus: {}, // Stores which problem IDs are done
+            dsaStatus: {}, 
             routine: [ {id: 1, time: "08:00", text: "Wake up"}, {id: 2, time: "08:30", text: "DSA"}, {id: 3, time: "10:00", text: "Work"} ],
             healthHistory: {},
             todayHealth: []
@@ -1407,7 +1404,7 @@
         window.render = function() {
             renderKPIs();
             renderProjects('Work'); renderProjects('Epam'); renderProjects('Learning');
-            renderDSAMastery(); // New Function
+            renderDSAMastery(); 
             renderHealth();
             updateCharts();
             document.getElementById('current-date').innerText = new Date().toLocaleDateString('en-IN', {weekday:'long', day:'numeric', month:'long'});
@@ -1426,7 +1423,6 @@
                 });
             });
             
-            // DSA Stats Logic
             let dsaTotalProblems = 0;
             let dsaSolvedCount = 0;
             dsaCurriculum.forEach(part => {
@@ -1463,23 +1459,38 @@
             text.innerText = labelType === '%' ? `${pct}%` : labelType;
         }
 
-        // NEW: RENDER DSA CARDS
+        // RENDER DSA MASTERY (Smart Sort Logic)
         function renderDSAMastery() {
             const container = document.getElementById('dsa-cards-container');
             container.innerHTML = '';
             const status = window.state.dsaStatus || {};
             let dsaSolved = 0; let dsaTotal = 0;
 
-            dsaCurriculum.forEach(part => {
-                const totalInPart = part.problems.length;
-                const solvedInPart = part.problems.filter(p => status[p.id]).length;
-                dsaTotal += totalInPart;
-                dsaSolved += solvedInPart;
-                const partProgress = Math.round((solvedInPart/totalInPart)*100);
-                const isComplete = partProgress === 100;
+            // Prepare Parts with status
+            let partsData = dsaCurriculum.map(part => {
+                const total = part.problems.length;
+                const solved = part.problems.filter(p => status[p.id]).length;
+                return { ...part, solvedCount: solved, totalCount: total, isComplete: solved === total };
+            });
+
+            // Sort Parts: Incomplete first, then Complete (pushed to bottom)
+            const activeParts = partsData.filter(p => !p.isComplete);
+            const doneParts = partsData.filter(p => p.isComplete);
+            const sortedParts = [...activeParts, ...doneParts];
+
+            sortedParts.forEach((part, index) => {
+                dsaTotal += part.totalCount;
+                dsaSolved += part.solvedCount;
+                const partProgress = Math.round((part.solvedCount/part.totalCount)*100);
+                
+                // Highlight logic: First item in active list gets specific styling
+                const isNextUp = (index === 0 && !part.isComplete);
+                const highlightClass = isNextUp ? "card-highlight ring-4 ring-blue-50 border-blue-500" : (part.isComplete ? "opacity-60 bg-slate-50" : "border-slate-200");
+                const badge = isNextUp ? `<span class="bg-blue-100 text-blue-700 text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider mb-2 inline-block">Current Focus</span>` : "";
 
                 const cardHTML = `
-                <div class="card p-5 border-l-4 ${isComplete ? 'border-emerald-500 bg-emerald-50/50' : 'border-blue-500'}">
+                <div class="card p-5 border-l-4 ${part.isComplete ? 'border-emerald-500' : 'border-blue-500'} ${highlightClass} transition-all duration-300">
+                    ${badge}
                     <div class="flex justify-between items-start mb-2">
                         <div>
                             <h3 class="font-bold text-slate-800 text-base">${part.title}</h3>
@@ -1493,21 +1504,23 @@
                     </div>
 
                     <div class="space-y-2">
-                        ${part.problems.map(p => `
-                            <div class="flex items-center gap-3 p-2 rounded hover:bg-slate-50 transition border border-transparent hover:border-slate-100">
+                        ${part.problems.map(p => {
+                            const isDone = status[p.id];
+                            return `
+                            <div class="flex items-center gap-3 p-2 rounded hover:bg-slate-100/50 transition border border-transparent hover:border-slate-200">
                                 <input type="checkbox" class="custom-checkbox" 
-                                    ${status[p.id] ? 'checked' : ''} 
+                                    ${isDone ? 'checked' : ''} 
                                     onchange="toggleDSAProblem('${p.id}')">
-                                <a href="${p.url}" target="_blank" class="text-sm font-medium ${status[p.id] ? 'text-slate-400 line-through' : 'text-slate-700'} hover:text-blue-600 truncate flex-1">${p.name}</a>
+                                <a href="${p.url}" target="_blank" class="text-sm font-medium ${isDone ? 'text-slate-400 line-through' : 'text-slate-700'} hover:text-blue-600 truncate flex-1">${p.name}</a>
                                 <i class="ph-bold ph-arrow-square-out text-slate-300 text-xs"></i>
-                            </div>
-                        `).join('')}
+                            </div>`;
+                        }).join('')}
                     </div>
                 </div>`;
                 container.innerHTML += cardHTML;
             });
 
-            // Update Mini Chart in Header
+            // Update Mini Chart
             if(window.miniChart) window.miniChart.destroy();
             const ctx = document.getElementById('dsa-mini-chart');
             if(ctx) {
@@ -1525,33 +1538,53 @@
             window.saveToCloud(); window.render();
         };
 
+        // RENDER PROJECTS (Smart Sort Logic)
         function renderProjects(type) {
             const el = document.getElementById(`container-${type}`);
             const list = (window.state.projects||[]).filter(p => p.type === type);
             if(list.length === 0) { el.innerHTML = `<div class="col-span-full p-6 text-center text-slate-400 text-sm border-2 border-dashed border-slate-200 rounded-xl">No active projects</div>`; return; }
             let color = type === 'Epam' ? 'pink' : type === 'Learning' ? 'purple' : 'blue';
+            
             el.innerHTML = list.map(p => {
-                const subs = p.subtasks || []; 
+                const subs = p.subtasks || [];
                 const total = subs.length;
                 const sum = subs.reduce((a,b)=>a+parseInt(b.progress),0); 
                 const pct = total?Math.round(sum/total):0;
+
+                // Sort Subtasks: 100% done items go to bottom
+                const sortedSubs = [...subs].map((s, i) => ({...s, originalIndex: i})).sort((a, b) => {
+                    const aDone = parseInt(a.progress) === 100 ? 1 : 0;
+                    const bDone = parseInt(b.progress) === 100 ? 1 : 0;
+                    return aDone - bDone;
+                });
+
                 return `<div class="card p-4 relative border-l-4 border-${color}-500">
                     <div class="flex justify-between items-start mb-3">
                         <div><h3 class="font-bold text-slate-800 text-lg">${p.title}</h3><div class="text-xs text-slate-400 font-bold mt-0.5">${total} Tasks</div></div>
                         <div class="text-right">
                             <span class="text-2xl font-bold text-${color}-600 block">${pct}%</span>
-                            <button onclick="deleteProject(${p.id})" class="text-slate-300 hover:text-red-500 text-xs mt-1"><i class="ph-bold ph-trash"></i></button>
+                            <div class="flex gap-2 mt-1">
+                                <button onclick="openEditProjectModal(${p.id})" class="text-slate-300 hover:text-blue-500 text-xs"><i class="ph-bold ph-pencil-simple"></i></button>
+                                <button onclick="deleteProject(${p.id})" class="text-slate-300 hover:text-red-500 text-xs"><i class="ph-bold ph-trash"></i></button>
+                            </div>
                         </div>
                     </div>
                     <div class="w-full bg-slate-100 rounded-full h-1.5 mb-4 overflow-hidden"><div class="bg-${color}-500 h-1.5 rounded-full transition-all duration-500" style="width:${pct}%"></div></div>
-                    <div class="space-y-4">${subs.map((s, idx) => `
-                        <div class="group">
-                            <div class="flex justify-between text-xs mb-2 font-semibold text-slate-700">
-                                <span class="cursor-pointer hover:text-blue-600" onclick="openEditSubtaskModal(${p.id}, ${idx})">${s.title} <i class="ph-bold ph-pencil-simple ml-1 text-slate-300"></i></span>
-                                <span class="text-${color}-600">${s.progress}%</span>
-                            </div>
-                            <input type="range" class="w-full h-2 bg-slate-100 rounded-lg appearance-none cursor-pointer accent-${color}-600 hover:bg-slate-200 transition" min="0" max="100" value="${s.progress}" onchange="updateSubtask(${p.id}, ${idx}, this.value)">
-                        </div>`).join('')}
+                    <div class="space-y-4">
+                        ${sortedSubs.map((s) => {
+                            const isDone = parseInt(s.progress) === 100;
+                            return `
+                            <div class="group ${isDone ? 'opacity-50' : ''}">
+                                <div class="flex justify-between text-xs mb-2 font-semibold text-slate-700">
+                                    <span class="cursor-pointer hover:text-blue-600 ${isDone ? 'line-through' : ''}" onclick="openEditSubtaskModal(${p.id}, ${s.originalIndex})">${s.title} <i class="ph-bold ph-pencil-simple ml-1 text-slate-300"></i></span>
+                                    <div class="flex items-center gap-2">
+                                        <span class="text-${color}-600">${s.progress}%</span>
+                                        <input type="checkbox" class="w-3 h-3 accent-${color}-600 cursor-pointer" ${isDone ? 'checked' : ''} onchange="toggleSubtaskDone(${p.id}, ${s.originalIndex})">
+                                    </div>
+                                </div>
+                                <input type="range" class="w-full h-2 bg-slate-100 rounded-lg appearance-none cursor-pointer accent-${color}-600 hover:bg-slate-200 transition" min="0" max="100" value="${s.progress}" onchange="updateSubtask(${p.id}, ${s.originalIndex}, this.value)">
+                            </div>`;
+                        }).join('')}
                     </div>
                     <button onclick="openSubtaskModal(${p.id})" class="mt-6 w-full py-2.5 border border-dashed border-slate-300 text-slate-500 rounded-lg text-xs font-bold uppercase tracking-wider hover:bg-slate-50 hover:border-slate-400 transition">+ Add Task</button>
                 </div>`;
@@ -1587,11 +1620,7 @@
                 const sc = (s/m)*100; 
                 if(p.type==='Work') w+=sc; else if(p.type==='Epam') e+=sc; else l+=sc; 
             });
-            // Chart shows progress of the 20 parts
-            let dsaSolved = 0; let dsaTotal = 0;
-            dsaCurriculum.forEach(part => { part.problems.forEach(p => { dsaTotal++; if(window.state.dsaStatus[p.id]) dsaSolved++; }); });
-            const d = dsaTotal ? Math.round((dsaSolved/dsaTotal)*100) : 0;
-
+            const d = (Object.keys(window.state.dsaStatus||{}).length/90)*100;
             window.myChart = new Chart(ctx, { 
                 type: 'doughnut', 
                 data: { labels: ['Work', 'Epam', 'Learn', 'DSA'], datasets: [{ data: [w||1, e||1, l||1, d||1], backgroundColor: ['#3b82f6', '#ec4899', '#8b5cf6', '#10b981'], borderWidth:0 }] }, 
@@ -1622,6 +1651,23 @@
                 window.state.projects.push({id:Date.now(), title:t, type, subtasks:[]}); 
                 window.saveToCloud(); window.render(); window.closeModal(); 
             }
+        };
+
+        // NEW: EDIT PROJECT
+        window.openEditProjectModal = (pid) => {
+            const p = window.state.projects.find(x => x.id === pid);
+            showModal(`
+                <h3 class="text-lg font-bold mb-4">Edit Project</h3>
+                <input type="text" id="edit-ptitle" class="w-full border p-3 rounded-lg mb-4 text-sm" value="${p.title}">
+                <button onclick="commitProjectEdit(${pid})" class="w-full bg-blue-600 text-white py-3 rounded-lg font-bold">Save Changes</button>
+            `);
+        };
+
+        window.commitProjectEdit = (pid) => {
+            const t = document.getElementById('edit-ptitle').value;
+            const p = window.state.projects.find(x => x.id === pid);
+            p.title = t;
+            window.saveToCloud(); window.render(); window.closeModal();
         };
 
         window.openSubtaskModal = (pid) => showModal(`
@@ -1737,14 +1783,21 @@
             window.state.projects.find(x=>x.id===pid).subtasks[idx].progress = val;
             window.saveToCloud(); window.render();
         };
+        // NEW: Toggle subtask done via checkbox
+        window.toggleSubtaskDone = (pid, idx) => {
+            const task = window.state.projects.find(x=>x.id===pid).subtasks[idx];
+            task.progress = parseInt(task.progress) === 100 ? 0 : 100;
+            window.saveToCloud(); window.render();
+        };
         window.deleteProject = (id) => {
             if(confirm('Delete Project?')) { window.state.projects = window.state.projects.filter(p=>p.id!==id); window.saveToCloud(); window.render(); }
         };
         window.exportData = () => { const d = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(window.state)); const a = document.createElement('a'); a.href = d; a.download = "sdet_backup.json"; a.click(); };
         window.resetApp = () => { if(confirm("Reset Everything?")) { window.state = {projects:[], dsaStatus:{}, routine:[], healthHistory:{}, todayHealth:[]}; window.saveToCloud(); location.reload(); }};
 
-        // Initial Load (if offline)
-        if(!db) window.render(); window.router('dashboard');
+        // Initial Load
+		window.render(); 
+		window.router('dashboard');
     </script>
 </body>
 </html>
