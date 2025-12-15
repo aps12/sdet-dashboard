@@ -3,78 +3,183 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>SDET Planner | Stable v15</title>
+    <title>Planner</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap');
+        
         :root { --safe-bottom: env(safe-area-inset-bottom); }
-        body { background-color: #f8fafc; font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparent; }
+        
+        body { 
+            background-color: #f8fafc; 
+            font-family: 'Inter', sans-serif; 
+            -webkit-tap-highlight-color: transparent; 
+        }
+        
+        /* Smooth Scrolling */
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-        .card { background: white; border-radius: 1rem; box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05), 0 1px 2px -1px rgba(0, 0, 0, 0.01); border: 1px solid #f1f5f9; }
-        .donut-ring { width: 56px; height: 56px; border-radius: 50%; background: conic-gradient(var(--color) calc(var(--percent) * 1%), #f1f5f9 0); position: relative; display: flex; justify-content: center; align-items: center; transition: background 0.5s ease; }
-        .donut-ring::before { content: ''; position: absolute; width: 44px; height: 44px; background: white; border-radius: 50%; }
+
+        /* Modern Card */
+        .card { 
+            background: white; 
+            border-radius: 1rem; 
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05), 0 1px 2px -1px rgba(0, 0, 0, 0.01);
+            border: 1px solid #f1f5f9;
+        }
+
+        /* Donut Chart */
+        .donut-ring {
+            width: 56px; height: 56px;
+            border-radius: 50%;
+            background: conic-gradient(var(--color) calc(var(--percent) * 1%), #f1f5f9 0);
+            position: relative;
+            display: flex; justify-content: center; align-items: center;
+            transition: background 0.5s ease;
+        }
+        .donut-ring::before {
+            content: ''; position: absolute;
+            width: 44px; height: 44px;
+            background: white; border-radius: 50%;
+        }
         .donut-text { position: relative; font-size: 0.7rem; font-weight: 800; color: #334155; }
-        .nav-btn { transition: all 0.2s; color: #94a3b8; }
-        .nav-btn.active { color: #2563eb; transform: scale(1.05); }
-        .sidebar-item { display: flex; align-items: center; gap: 12px; padding: 12px 16px; border-radius: 12px; color: #64748b; font-weight: 500; cursor: pointer; transition: all 0.2s; }
+
+        /* Sidebar Item Transition */
+        .sidebar-item { 
+            display: flex; align-items: center; 
+            padding: 12px; border-radius: 12px; 
+            color: #64748b; font-weight: 500; cursor: pointer; 
+            transition: all 0.2s;
+            white-space: nowrap; /* Prevent text wrapping during expansion */
+        }
         .sidebar-item:hover { background-color: #f8fafc; color: #1e293b; }
         .sidebar-item.active { background-color: #eff6ff; color: #2563eb; font-weight: 600; }
+        
+        /* Sidebar Icon centering when collapsed */
+        .group:not(:hover) .sidebar-item { justify-content: center; }
+        .group:hover .sidebar-item { justify-content: flex-start; }
+
+        /* Text Hide/Show transition */
+        .nav-text {
+            opacity: 0; width: 0; display: none;
+            transition: opacity 0.2s ease-in-out;
+        }
+        .group:hover .nav-text {
+            opacity: 1; width: auto; display: inline-block;
+        }
+
+        /* Loader */
         .loader { border: 3px solid #e2e8f0; border-top: 3px solid #3b82f6; border-radius: 50%; width: 20px; height: 20px; animation: spin 1s linear infinite; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     </style>
 </head>
 <body class="flex h-screen overflow-hidden text-slate-800 bg-slate-50">
 
-    <aside class="w-72 bg-white border-r border-slate-200 flex-col justify-between hidden md:flex z-30">
-        <div>
-            <div class="p-8 flex items-center gap-3">
-                <div class="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center text-white shadow-blue-200 shadow-lg"><i class="ph-bold ph-rocket-launch text-xl"></i></div>
-                <div><h1 class="font-bold text-lg leading-tight text-slate-900">Planner</h1><p class="text-xs text-slate-400 font-medium">SDET Edition</p></div>
+    <aside class="group fixed h-full z-50 w-20 hover:w-72 bg-white border-r border-slate-200 flex-col justify-between hidden md:flex transition-all duration-300 ease-in-out shadow-lg hover:shadow-xl">
+        <div class="overflow-hidden">
+            <div class="h-20 flex items-center px-5 gap-3 transition-all duration-300">
+                <div class="w-10 h-10 min-w-[2.5rem] bg-blue-600 rounded-xl flex items-center justify-center text-white shadow-blue-200 shadow-lg"><i class="ph-bold ph-rocket-launch text-xl"></i></div>
+                <div class="nav-text whitespace-nowrap">
+                    <h1 class="font-bold text-lg leading-tight text-slate-900">Planner</h1>
+                    <p class="text-xs text-slate-400 font-medium">SDET Edition</p>
+                </div>
             </div>
-            <nav class="px-6 space-y-1">
-                <button onclick="router('dashboard')" id="d-nav-dashboard" class="sidebar-item active w-full"><i class="ph ph-squares-four text-lg"></i> Dashboard</button>
-                <button onclick="router('dsa')" id="d-nav-dsa" class="sidebar-item w-full"><i class="ph ph-brackets-curly text-lg"></i> 90-Day DSA</button>
-                <button onclick="router('projects')" id="d-nav-projects" class="sidebar-item w-full"><i class="ph ph-briefcase text-lg"></i> Client Work</button>
-                <button onclick="router('epam')" id="d-nav-epam" class="sidebar-item w-full"><i class="ph ph-code text-lg"></i> Personal/Epam</button>
-                <button onclick="router('learning')" id="d-nav-learning" class="sidebar-item w-full"><i class="ph ph-certificate text-lg"></i> Learning</button>
-                <button onclick="router('health')" id="d-nav-health" class="sidebar-item w-full"><i class="ph ph-heartbeat text-lg"></i> Routine</button>
+            
+            <nav class="px-3 space-y-2 mt-4">
+                <button onclick="router('dashboard')" id="d-nav-dashboard" class="sidebar-item active w-full" title="Dashboard">
+                    <i class="ph ph-squares-four text-2xl"></i> <span class="nav-text ml-2">Dashboard</span>
+                </button>
+                <button onclick="router('dsa')" id="d-nav-dsa" class="sidebar-item w-full" title="DSA Roadmap">
+                    <i class="ph ph-brackets-curly text-2xl"></i> <span class="nav-text ml-2">90-Day DSA</span>
+                </button>
+                <button onclick="router('projects')" id="d-nav-projects" class="sidebar-item w-full" title="Client Work">
+                    <i class="ph ph-briefcase text-2xl"></i> <span class="nav-text ml-2">Client Work</span>
+                </button>
+                <button onclick="router('epam')" id="d-nav-epam" class="sidebar-item w-full" title="Epam / Personal">
+                    <i class="ph ph-code text-2xl"></i> <span class="nav-text ml-2">Personal/Epam</span>
+                </button>
+                <button onclick="router('learning')" id="d-nav-learning" class="sidebar-item w-full" title="Learning">
+                    <i class="ph ph-certificate text-2xl"></i> <span class="nav-text ml-2">Learning</span>
+                </button>
+                <button onclick="router('health')" id="d-nav-health" class="sidebar-item w-full" title="Routine">
+                    <i class="ph ph-heartbeat text-2xl"></i> <span class="nav-text ml-2">Routine</span>
+                </button>
             </nav>
         </div>
-        <div class="p-6 border-t border-slate-100 bg-slate-50/50">
-            <div class="flex items-center gap-2 justify-center text-xs font-semibold text-slate-400 mb-3">
-                <div id="sync-status-icon" class="w-2 h-2 rounded-full bg-red-500"></div><span id="sync-status-text">Connecting...</span>
+
+        <div class="p-4 border-t border-slate-100 bg-slate-50/50 overflow-hidden whitespace-nowrap">
+            <div class="flex items-center gap-3 justify-center group-hover:justify-start transition-all">
+                <div id="sync-status-icon" class="w-2.5 h-2.5 rounded-full bg-red-500 shrink-0"></div>
+                <span id="sync-status-text" class="nav-text text-xs font-semibold text-slate-400">Connecting...</span>
             </div>
-            <button onclick="exportData()" class="w-full text-xs text-slate-600 font-bold py-2.5 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 transition shadow-sm">Backup Data</button>
+            <button onclick="exportData()" class="mt-3 w-full h-10 flex items-center justify-center bg-white border border-slate-200 rounded-lg hover:bg-slate-50 text-slate-600 transition shadow-sm" title="Backup Data">
+                <i class="ph-bold ph-download-simple text-lg"></i>
+                <span class="nav-text ml-2 text-xs font-bold">Backup Data</span>
+            </button>
         </div>
     </aside>
 
-    <main class="flex-1 overflow-y-auto no-scrollbar relative bg-slate-50 pb-32 md:pb-8">
+    <main class="flex-1 md:ml-20 overflow-y-auto no-scrollbar relative bg-slate-50 pb-32 md:pb-8 transition-all duration-300">
+        
         <header class="sticky top-0 z-20 bg-white/80 backdrop-blur-md border-b border-slate-200 px-6 py-4 flex justify-between items-center shadow-sm">
-            <div><h1 class="text-xl font-bold text-slate-900 tracking-tight" id="page-title">Overview</h1><p class="text-slate-500 text-xs font-medium" id="current-date">Loading...</p></div>
-            <div class="flex items-center gap-4"><div id="loading-spinner" class="hidden"><div class="loader"></div></div><button onclick="resetApp()" class="md:hidden text-slate-400 p-2"><i class="ph-bold ph-trash"></i></button></div>
+            <div>
+                <h1 class="text-xl font-bold text-slate-900 tracking-tight" id="page-title">Overview</h1>
+                <p class="text-slate-500 text-xs font-medium" id="current-date">Loading...</p>
+            </div>
+            <div class="flex items-center gap-4">
+                <div id="loading-spinner" class="hidden"><div class="loader"></div></div>
+                <button onclick="resetApp()" class="md:hidden text-slate-400 p-2"><i class="ph-bold ph-trash"></i></button>
+            </div>
         </header>
 
         <div class="p-4 md:p-8 max-w-7xl mx-auto">
+
             <div id="view-dashboard" class="space-y-6">
                 <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 md:gap-4">
-                    <div class="card p-4 flex flex-col items-center justify-center gap-3" id="kpi-overall"><div class="donut-ring" style="--percent:0; --color:#3b82f6"><span class="donut-text">0%</span></div><span class="text-[11px] font-bold text-slate-500 uppercase tracking-wide">Overall</span></div>
-                    <div class="card p-4 flex flex-col items-center justify-center gap-3" id="kpi-dsa"><div class="donut-ring" style="--percent:0; --color:#10b981"><span class="donut-text">0</span></div><span class="text-[11px] font-bold text-slate-500 uppercase tracking-wide">DSA (90)</span></div>
-                    <div class="card p-4 flex flex-col items-center justify-center gap-3" id="kpi-client"><div class="donut-ring" style="--percent:0; --color:#6366f1"><span class="donut-text">0%</span></div><span class="text-[11px] font-bold text-slate-500 uppercase tracking-wide">Client</span></div>
-                    <div class="card p-4 flex flex-col items-center justify-center gap-3" id="kpi-epam"><div class="donut-ring" style="--percent:0; --color:#ec4899"><span class="donut-text">0%</span></div><span class="text-[11px] font-bold text-slate-500 uppercase tracking-wide">Epam</span></div>
-                    <div class="card p-4 flex flex-col items-center justify-center gap-3" id="kpi-cert"><div class="donut-ring" style="--percent:0; --color:#8b5cf6"><span class="donut-text">0%</span></div><span class="text-[11px] font-bold text-slate-500 uppercase tracking-wide">Certs</span></div>
-                    <div class="card p-4 flex flex-col items-center justify-center gap-3" id="kpi-streak"><div class="donut-ring" style="--percent:0; --color:#f59e0b"><span class="donut-text">0</span></div><span class="text-[11px] font-bold text-slate-500 uppercase tracking-wide">Streak</span></div>
+                    <div class="card p-4 flex flex-col items-center justify-center gap-3" id="kpi-overall">
+                        <div class="donut-ring" style="--percent:0; --color:#3b82f6"><span class="donut-text">0%</span></div>
+                        <span class="text-[11px] font-bold text-slate-500 uppercase tracking-wide">Overall</span>
+                    </div>
+                    <div class="card p-4 flex flex-col items-center justify-center gap-3" id="kpi-dsa">
+                        <div class="donut-ring" style="--percent:0; --color:#10b981"><span class="donut-text">0</span></div>
+                        <span class="text-[11px] font-bold text-slate-500 uppercase tracking-wide">DSA (90)</span>
+                    </div>
+                    <div class="card p-4 flex flex-col items-center justify-center gap-3" id="kpi-client">
+                        <div class="donut-ring" style="--percent:0; --color:#6366f1"><span class="donut-text">0%</span></div>
+                        <span class="text-[11px] font-bold text-slate-500 uppercase tracking-wide">Client</span>
+                    </div>
+                    <div class="card p-4 flex flex-col items-center justify-center gap-3" id="kpi-epam">
+                        <div class="donut-ring" style="--percent:0; --color:#ec4899"><span class="donut-text">0%</span></div>
+                        <span class="text-[11px] font-bold text-slate-500 uppercase tracking-wide">Epam</span>
+                    </div>
+                    <div class="card p-4 flex flex-col items-center justify-center gap-3" id="kpi-cert">
+                        <div class="donut-ring" style="--percent:0; --color:#8b5cf6"><span class="donut-text">0%</span></div>
+                        <span class="text-[11px] font-bold text-slate-500 uppercase tracking-wide">Certs</span>
+                    </div>
+                    <div class="card p-4 flex flex-col items-center justify-center gap-3" id="kpi-streak">
+                        <div class="donut-ring" style="--percent:0; --color:#f59e0b"><span class="donut-text">0</span></div>
+                        <span class="text-[11px] font-bold text-slate-500 uppercase tracking-wide">Streak</span>
+                    </div>
                 </div>
+
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
                     <div class="card p-5 h-[340px] flex flex-col">
-                        <div class="flex items-center gap-2 mb-4 pb-2 border-b border-slate-100"><div class="w-6 h-6 rounded-full bg-orange-100 flex items-center justify-center text-orange-600"><i class="ph-fill ph-fire"></i></div><h3 class="font-bold text-slate-800 text-sm uppercase tracking-wide">High Priority</h3></div>
+                        <div class="flex items-center gap-2 mb-4 pb-2 border-b border-slate-100">
+                            <div class="w-6 h-6 rounded-full bg-orange-100 flex items-center justify-center text-orange-600"><i class="ph-fill ph-fire"></i></div>
+                            <h3 class="font-bold text-slate-800 text-sm uppercase tracking-wide">High Priority</h3>
+                        </div>
                         <div id="focus-list" class="space-y-2 overflow-y-auto flex-1 pr-1 custom-scroll"></div>
                     </div>
                     <div class="card p-5 h-[340px] flex flex-col">
-                        <div class="flex items-center gap-2 mb-2"><div class="w-6 h-6 rounded-full bg-blue-100 flex items-center justify-center text-blue-600"><i class="ph-fill ph-chart-pie-slice"></i></div><h3 class="font-bold text-slate-800 text-sm uppercase tracking-wide">Effort Split</h3></div>
-                        <div class="flex-1 relative w-full h-full flex items-center justify-center"><canvas id="chart-domain"></canvas></div>
+                        <div class="flex items-center gap-2 mb-2">
+                            <div class="w-6 h-6 rounded-full bg-blue-100 flex items-center justify-center text-blue-600"><i class="ph-fill ph-chart-pie-slice"></i></div>
+                            <h3 class="font-bold text-slate-800 text-sm uppercase tracking-wide">Effort Split</h3>
+                        </div>
+                        <div class="flex-1 relative w-full h-full flex items-center justify-center">
+                            <canvas id="chart-domain"></canvas>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -82,7 +187,10 @@
             <div id="view-dsa" class="hidden space-y-4">
                 <div class="card p-4 sticky top-0 z-10 shadow-md border-b-2 border-emerald-500 rounded-none -mx-4 md:rounded-xl md:mx-0">
                     <div class="flex justify-between items-center">
-                        <div><h2 class="text-lg font-bold text-slate-900">90-Day Roadmap</h2><p class="text-xs text-slate-500 font-medium" id="dsa-progress-text">Loading...</p></div>
+                        <div>
+                            <h2 class="text-lg font-bold text-slate-900">90-Day Roadmap</h2>
+                            <p class="text-xs text-slate-500 font-medium" id="dsa-progress-text">Loading...</p>
+                        </div>
                         <button onclick="openAddDSAModal()" class="bg-emerald-600 text-white w-10 h-10 rounded-full flex items-center justify-center shadow-lg hover:bg-emerald-700 active:scale-95 transition"><i class="ph-bold ph-plus text-lg"></i></button>
                     </div>
                 </div>
@@ -90,26 +198,49 @@
             </div>
 
             <div id="view-projects" class="hidden space-y-4">
-                <div class="flex justify-between items-center mb-2 px-1"><h2 class="text-xl font-bold text-slate-800">Client Work</h2><button onclick="openProjectModal('Work')" class="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-semibold shadow-md hover:bg-blue-700">+ New Project</button></div>
+                <div class="flex justify-between items-center mb-2 px-1">
+                    <h2 class="text-xl font-bold text-slate-800">Client Work</h2>
+                    <button onclick="openProjectModal('Work')" class="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-semibold shadow-md hover:bg-blue-700">+ New Project</button>
+                </div>
                 <div id="container-Work" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
             </div>
+
             <div id="view-epam" class="hidden space-y-4">
-                <div class="flex justify-between items-center mb-2 px-1"><h2 class="text-xl font-bold text-pink-700">Epam / Personal</h2><button onclick="openProjectModal('Epam')" class="bg-pink-600 text-white px-4 py-2 rounded-lg text-sm font-semibold shadow-md hover:bg-pink-700">+ New Project</button></div>
+                <div class="flex justify-between items-center mb-2 px-1">
+                    <h2 class="text-xl font-bold text-pink-700">Epam / Personal</h2>
+                    <button onclick="openProjectModal('Epam')" class="bg-pink-600 text-white px-4 py-2 rounded-lg text-sm font-semibold shadow-md hover:bg-pink-700">+ New Project</button>
+                </div>
                 <div id="container-Epam" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
             </div>
+
             <div id="view-learning" class="hidden space-y-4">
-                <div class="flex justify-between items-center mb-2 px-1"><h2 class="text-xl font-bold text-purple-700">Certifications</h2><button onclick="openProjectModal('Learning')" class="bg-purple-600 text-white px-4 py-2 rounded-lg text-sm font-semibold shadow-md hover:bg-purple-700">+ New Cert</button></div>
+                <div class="flex justify-between items-center mb-2 px-1">
+                    <h2 class="text-xl font-bold text-purple-700">Certifications</h2>
+                    <button onclick="openProjectModal('Learning')" class="bg-purple-600 text-white px-4 py-2 rounded-lg text-sm font-semibold shadow-md hover:bg-purple-700">+ New Cert</button>
+                </div>
                 <div id="container-Learning" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
             </div>
 
             <div id="view-health" class="hidden space-y-4">
                 <div class="card p-6 border-t-4 border-orange-500">
-                    <div class="flex justify-between items-center mb-6"><h3 class="font-bold text-lg text-slate-800">Today's Routine</h3><button onclick="openRoutineModal()" class="text-xs bg-slate-100 px-3 py-1.5 rounded-full font-bold text-slate-600 border border-slate-200">Edit List</button></div>
+                    <div class="flex justify-between items-center mb-6">
+                        <h3 class="font-bold text-lg text-slate-800">Today's Routine</h3>
+                        <button onclick="openRoutineModal()" class="text-xs bg-slate-100 px-3 py-1.5 rounded-full font-bold text-slate-600 border border-slate-200">Edit List</button>
+                    </div>
                     <div id="health-today-list" class="space-y-3"></div>
                     <button onclick="saveHealthDay()" class="mt-8 w-full bg-slate-900 text-white py-3.5 rounded-xl font-bold text-sm shadow-lg active:scale-95 transition flex items-center justify-center gap-2"><i class="ph-bold ph-check"></i> Finish Day</button>
                 </div>
-                <div class="card p-6"><h3 class="font-bold text-xs text-slate-400 uppercase tracking-widest mb-4">Consistency Log</h3><div class="overflow-y-auto max-h-64"><table class="w-full text-sm"><thead class="text-left text-xs text-slate-400 border-b border-slate-100"><tr><th class="pb-2">Date</th><th class="pb-2 text-right">Score</th></tr></thead><tbody id="health-history-body"></tbody></table></div></div>
+                <div class="card p-6">
+                    <h3 class="font-bold text-xs text-slate-400 uppercase tracking-widest mb-4">Consistency Log</h3>
+                    <div class="overflow-y-auto max-h-64">
+                        <table class="w-full text-sm">
+                            <thead class="text-left text-xs text-slate-400 border-b border-slate-100"><tr><th class="pb-2">Date</th><th class="pb-2 text-right">Score</th></tr></thead>
+                            <tbody id="health-history-body"></tbody>
+                        </table>
+                    </div>
+                </div>
             </div>
+
         </div>
     </main>
 
@@ -130,7 +261,7 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
         import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
-        // --- YOUR FIREBASE KEYS ---
+        // --- PASTE YOUR FIREBASE KEYS BELOW ---
         const firebaseConfig = {
             apiKey: "AIzaSyDSeqlg_QIEzHx2n15GcOP5jgKZzQ_MzZg",
             authDomain: "sdet-dashboard.firebaseapp.com",
@@ -140,16 +271,74 @@
             messagingSenderId: "917849703698",
             appId: "1:917849703698:web:764162e0198e5cf9439fcb"
         };
+        // ----------------------------------------
 
-        // --- DATA DEFAULTS ---
-        const dsa90Days = [ { day: 1, topic: "Arrays", task: "Build Array Permutation", link: "https://leetcode.com/problems/build-array-from-permutation/", pri: "Low" } ];
-        for(let i=2; i<=90; i++) {
+        let app, db, firebaseActive = false;
+
+        try {
+            app = initializeApp(firebaseConfig);
+            db = getDatabase(app);
+            firebaseActive = true;
+            const starCountRef = ref(db, 'sdet_dashboard');
+            onValue(starCountRef, (snapshot) => {
+                const data = snapshot.val();
+                if(data) {
+                    window.state = data;
+                    if (!window.state.projects) window.state.projects = [];
+                    if (!window.state.dsa) window.state.dsa = [];
+                    if (!window.state.dsaStatus) window.state.dsaStatus = {};
+                    if (!window.state.routine) window.state.routine = [];
+                    if (!window.state.healthHistory) window.state.healthHistory = {};
+                    if (!window.state.todayHealth) window.state.todayHealth = [];
+                    
+                    if(window.state.dsa.length > 0 && !window.state.dsa[0].id) { 
+                        window.state.dsa = window.state.dsa.map((x,i) => ({...x, id: Date.now()+i})); 
+                    }
+                    window.render();
+                    updateSyncStatus(true);
+                } else {
+                    window.saveToCloud();
+                }
+            }, (error) => { updateSyncStatus(false); });
+        } catch(e) { updateSyncStatus(false); }
+
+        window.saveToCloud = function() {
+            if(firebaseActive && db && window.state) {
+                document.getElementById('loading-spinner').classList.remove('hidden');
+                const cleanState = JSON.parse(JSON.stringify(window.state));
+                set(ref(db, 'sdet_dashboard'), cleanState).then(() => {
+                    document.getElementById('loading-spinner').classList.add('hidden');
+                }).catch(e => { document.getElementById('loading-spinner').classList.add('hidden'); });
+            }
+        }
+
+        function updateSyncStatus(connected) {
+            const icon = document.getElementById('sync-status-icon');
+            const text = document.getElementById('sync-status-text');
+            if(icon && text) {
+                if(connected) {
+                    icon.className = "w-2 h-2 rounded-full bg-emerald-500 animate-pulse";
+                    text.innerText = "Synced";
+                } else {
+                    icon.className = "w-2 h-2 rounded-full bg-slate-400";
+                    text.innerText = "Offline";
+                }
+            }
+        }
+    </script>
+
+    <script>
+        // --- DEFAULT DATA ---
+        const dsa90Days = [
+            { day: 1, topic: "Arrays", task: "Build Array Permutation", link: "https://leetcode.com/problems/build-array-from-permutation/", pri: "Low" },
+            { day: 2, topic: "Arrays", task: "Contains Duplicate", link: "https://leetcode.com/problems/contains-duplicate/", pri: "Low" }
+        ];
+        for(let i=3; i<=90; i++) {
             let topic = i<30?"Strings":i<50?"Stacks":i<70?"Trees":"DP";
             dsa90Days.push({day: i, topic: topic, task: `Problem Day ${i}`, link: "#", pri: "Medium"});
         }
         const dsaWithIds = dsa90Days.map((x, i) => ({ ...x, id: Date.now() + i }));
 
-        // STATE
         window.state = {
             projects: [],
             dsa: dsaWithIds,
@@ -159,8 +348,14 @@
             todayHealth: []
         };
 
-        // --- HELPER FUNCTIONS ---
-        function getPct(n, d) { return d ? Math.round((n/d)*100) : 0; }
+        // --- RENDER SYSTEM ---
+        window.render = function() {
+            renderKPIs();
+            renderProjects('Work'); renderProjects('Epam'); renderProjects('Learning');
+            renderDSA(); renderHealth();
+            updateCharts();
+            document.getElementById('current-date').innerText = new Date().toLocaleDateString('en-IN', {weekday:'long', day:'numeric', month:'long'});
+        }
 
         function renderKPIs() {
             let totalT=0, totalD=0; let clientT=0, clientD=0; let epamT=0, epamD=0; let learnT=0, learnD=0; let hiPri = [];
@@ -179,6 +374,7 @@
                 if(d.pri==='High' && !window.state.dsaStatus[d.id]) hiPri.push({t:d.task, c:`Day ${d.day}`});
             });
 
+            const getPct = (n,d) => d ? Math.round((n/d)*100) : 0;
             const dsaDone = Object.keys(window.state.dsaStatus||{}).length;
             const dsaTotal = (window.state.dsa||[]).length || 1;
             
@@ -337,6 +533,7 @@
         window.exportData = () => { const d = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(window.state)); const a = document.createElement('a'); a.href = d; a.download = "sdet_backup.json"; a.click(); };
         window.resetApp = () => { if(confirm("Reset Everything?")) { window.state = {projects:[], dsa:[], dsaStatus:{}, routine:[], healthHistory:{}, todayHealth:[]}; window.saveToCloud(); location.reload(); }};
 
+        // Router
         window.router = (view) => {
             document.querySelectorAll('[id^="view-"]').forEach(e => e.classList.add('hidden'));
             document.getElementById(`view-${view}`).classList.remove('hidden');
@@ -347,68 +544,8 @@
             if(view === 'dashboard') updateCharts();
         };
 
-        // --- FIREBASE INIT ---
-        let app, db, firebaseActive = false;
-        try {
-            const mod = await import("https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js");
-            const dbMod = await import("https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js");
-            
-            app = mod.initializeApp({
-                apiKey: "AIzaSyDSeqlg_QIEzHx2n15GcOP5jgKZzQ_MzZg",
-                authDomain: "sdet-dashboard.firebaseapp.com",
-                databaseURL: "https://sdet-dashboard-default-rtdb.firebaseio.com",
-                projectId: "sdet-dashboard",
-                storageBucket: "sdet-dashboard.firebasestorage.app",
-                messagingSenderId: "917849703698",
-                appId: "1:917849703698:web:764162e0198e5cf9439fcb"
-            });
-            db = dbMod.getDatabase(app);
-            firebaseActive = true;
-            
-            window.saveToCloud = function() {
-                if(firebaseActive && db && window.state) {
-                    document.getElementById('loading-spinner').classList.remove('hidden');
-                    dbMod.set(dbMod.ref(db, 'sdet_dashboard'), JSON.parse(JSON.stringify(window.state)))
-                        .then(() => document.getElementById('loading-spinner').classList.add('hidden'))
-                        .catch(() => document.getElementById('loading-spinner').classList.add('hidden'));
-                }
-            }
-
-            dbMod.onValue(dbMod.ref(db, 'sdet_dashboard'), (snapshot) => {
-                const data = snapshot.val();
-                if(data) {
-                    window.state = data;
-                    if (!window.state.projects) window.state.projects = [];
-                    if (!window.state.dsa) window.state.dsa = [];
-                    if (!window.state.dsaStatus) window.state.dsaStatus = {};
-                    if (!window.state.routine) window.state.routine = [];
-                    if (!window.state.healthHistory) window.state.healthHistory = {};
-                    if (!window.state.todayHealth) window.state.todayHealth = [];
-                    window.render();
-                    updateSyncStatus(true);
-                } else {
-                    window.saveToCloud();
-                }
-            }, () => updateSyncStatus(false));
-
-        } catch(e) { updateSyncStatus(false); }
-
-        function updateSyncStatus(connected) {
-            const icon = document.getElementById('sync-status-icon');
-            const text = document.getElementById('sync-status-text');
-            if(icon && text) {
-                if(connected) {
-                    icon.className = "w-2 h-2 rounded-full bg-emerald-500 animate-pulse";
-                    text.innerText = "Synced";
-                } else {
-                    icon.className = "w-2 h-2 rounded-full bg-slate-400";
-                    text.innerText = "Offline";
-                }
-            }
-        }
-
-        // Init Router
-        window.router('dashboard');
+        // Init
+        if(!db) window.render(); window.router('dashboard');
     </script>
 </body>
 </html>
